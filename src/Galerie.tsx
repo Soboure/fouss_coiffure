@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, User, Baby } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { img } from 'motion/react-client';
 
 const categories = [
   { id: 'femme', label: 'Femmes', icon: Users },
@@ -11,28 +12,24 @@ const categories = [
 
 const galleryData = {
   femme: [
-    'https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1571442463800-1337d7af9d2f?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1531123414708-f52f38b154d8?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1615165893325-1e428a2a5303?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1531123897727-8f129e1bfa82?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1531384441138-2736e62e0919?q=80&w=800&auto=format&fit=crop',
+    '/images/femme2.jpg',
   ],
+    
   homme: [
-    'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=800&auto=format&fit=crop',
+    '/images/homme1.jpg',
+    '/images/homme2.jpg',
+    '/images/homme3.jpg',
+    '/images/homme4.jpg',
+    '/images/homme5.jpg',
+    '/images/homme6.jpg',
+
   ],
   enfant: [
-    'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1544098485-2a2ed6da40ba?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1530651764912-85513784930d?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1514173040522-3f9e3ef688b4?q=80&w=800&auto=format&fit=crop',
+    '/images/enfant1.jpg',
+    '/images/enfant2.jpg',
+    '/images/enfant3.jpg',
+    '/images/enfant4.jpg',
+    '/images/enfant5.jpg',
   ],
 };
 
