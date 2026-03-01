@@ -124,7 +124,7 @@ export default function MainSite() {
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16">
           <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight drop-shadow-lg">
-            L'Élégance <br/><span className="italic font-light text-[#D4AF37]">au Naturel</span>
+            L'Excellence <br/><span className="italic font-light text-[#D4AF37]">à votre mesure</span>
           </h1>
           <p className="text-lg text-white/90 mb-10 drop-shadow-md">Le salon de référence à Cotonou. Espace Standard & Suite VIP.</p>
           <button onClick={() => scrollTo('booking')} className="bg-[#D4AF37] text-[#2A2A2A] px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase hover:bg-white transition-colors shadow-xl hover:scale-105 transform duration-300">
