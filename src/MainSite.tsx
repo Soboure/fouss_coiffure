@@ -23,7 +23,7 @@ const gallery = [
   'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?q=80&w=800&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1571442463800-1337d7af9d2f?q=80&w=800&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1531123414708-f52f38b154d8?q=80&w=800&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1615165893325-1e428a2a5303?q=80&w=800&auto=format&fit=crop',
+  'https://pin.it/3Ng5JdVjk',
 ];
 
 const team = [
