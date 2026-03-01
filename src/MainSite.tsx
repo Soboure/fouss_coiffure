@@ -18,11 +18,12 @@ const services = {
 };
 
 const gallery = [
+  'https://storage.googleapis.com/aistudio-user-content-prod-eu-west2/400741392831/1740829986326164-22d7168c0b5de8a8.jpg',
   'https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=800&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?q=80&w=800&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1571442463800-1337d7af9d2f?q=80&w=800&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1531123414708-f52f38b154d8?q=80&w=800&auto=format&fit=crop',
-  'https://pin.it/3Ng5JdVjk',
+  'https://images.unsplash.com/photo-1615165893325-1e428a2a5303?q=80&w=800&auto=format&fit=crop',
 ];
 
 const team = [
@@ -96,7 +97,7 @@ export default function MainSite() {
           <div className="hidden md:flex space-x-8 items-center">
             <button onClick={() => scrollTo('home')} className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">Accueil</button>
             <Link to="/tarifs" className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">Tarifs</Link>
-            <button onClick={() => scrollTo('gallery')} className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">Galerie</button>
+            <Link to="/galerie" className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">Galerie</Link>
             <button onClick={() => scrollTo('team')} className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">L'Équipe</button>
             <button onClick={() => scrollTo('booking')} className="bg-[#8C7A6B] text-white px-6 py-2 rounded-full text-sm hover:bg-[#736356]">Réserver</button>
           </div>
@@ -123,7 +124,7 @@ export default function MainSite() {
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16">
           <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight drop-shadow-lg">
-            L'Éxcellence <br/><span className="italic font-light text-[#D4AF37]">à votre mesure</span>
+            L'Élégance <br/><span className="italic font-light text-[#D4AF37]">au Naturel</span>
           </h1>
           <p className="text-lg text-white/90 mb-10 drop-shadow-md">Le salon de référence à Cotonou. Espace Standard & Suite VIP.</p>
           <button onClick={() => scrollTo('booking')} className="bg-[#D4AF37] text-[#2A2A2A] px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase hover:bg-white transition-colors shadow-xl hover:scale-105 transform duration-300">
@@ -136,12 +137,20 @@ export default function MainSite() {
       <section id="gallery" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-serif font-bold text-[#4A4238] text-center mb-12">Nos Réalisations</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
             {gallery.map((img, i) => (
               <div key={i} className="aspect-[4/5] overflow-hidden rounded-2xl">
                 <img src={img} alt="Coiffure" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
               </div>
             ))}
+          </div>
+          <div className="text-center">
+            <Link to="/galerie" className="inline-flex items-center text-[#8C7A6B] font-medium hover:underline group">
+              Voir toute la galerie
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
