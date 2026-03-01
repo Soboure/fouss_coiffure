@@ -18,7 +18,6 @@ const services = {
 };
 
 const gallery = [
-  'https://storage.googleapis.com/aistudio-user-content-prod-eu-west2/400741392831/1740829986326164-22d7168c0b5de8a8.jpg',
   'https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=800&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?q=80&w=800&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1571442463800-1337d7af9d2f?q=80&w=800&auto=format&fit=crop',
