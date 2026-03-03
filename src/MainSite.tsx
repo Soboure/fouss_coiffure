@@ -18,19 +18,19 @@ const services = {
 };
 
 const gallery = [
-  '/Images/homme1.jpg',
-  '/Images/homme2.jpg',
-  '/Images/homme3.jpg',
-  '/Images/femme2.jpg',
-  '/Images/enfant1.jpg',
-  '/Images/enfant2.jpg',
+  '/photos/homme1.jpg',
+  '/photos/homme2.jpg',
+  '/photos/homme3.jpg',
+  '/photos/femme2.jpg',
+  '/photos/enfant1.jpg',
+  '/photos/enfant2.jpg',
 ];
 
 const team = [
-  { name: 'Soboure', role: 'Directeur & Expert', image: '/Images/expert1.jpg' },
-  { name: 'Ibrahim', role: 'Maître Barbier', image: '/Images/expert2.jpg' },
-  { name: 'Fadel', role: 'Spécialiste Soins Nappy', image: '/Images/expert3.jpg' },
-  { name: 'Kader', role: 'Coiffeur Visagiste', image: '/Images/expert4.jpg' },
+  { name: 'Soboure', role: 'Directeur & Expert', image: '/photos/expert1.jpg' },
+  { name: 'Ibrahim', role: 'Maître Barbier', image: '/photos/expert2.jpg' },
+  { name: 'Fadel', role: 'Spécialiste Soins Nappy', image: '/photos/expert3.jpg' },
+  { name: 'Kader', role: 'Coiffeur Visagiste', image: '/photos/expert4.jpg' },
 ];
 
 export default function MainSite() {
