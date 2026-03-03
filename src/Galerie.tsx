@@ -12,7 +12,11 @@ const categories = [
 
 const galleryData = {
   femme: [
+    '/images/femme1.jpg',
     '/images/femme2.jpg',
+    '/images/femme3.jpg',
+    '/images/femme4.jpg',
+    '/images/femme5.jpg',
   ],
     
   homme: [
@@ -22,6 +26,10 @@ const galleryData = {
     '/images/homme4.jpg',
     '/images/homme5.jpg',
     '/images/homme6.jpg',
+    '/images/homme7.jpg',
+    '/images/homme8.jpg',
+    '/images/homme9.jpg',
+    '/images/homme10.jpg',
 
   ],
   enfant: [
@@ -30,6 +38,7 @@ const galleryData = {
     '/images/enfant3.jpg',
     '/images/enfant4.jpg',
     '/images/enfant5.jpg',
+    '/images/enfant6.jpg',
   ],
 };
 
