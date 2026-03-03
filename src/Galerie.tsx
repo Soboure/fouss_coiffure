@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, User, Baby } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { img } from 'motion/react-client';
 
 const categories = [
   { id: 'femme', label: 'Femmes', icon: Users },
@@ -12,33 +11,32 @@ const categories = [
 
 const galleryData = {
   femme: [
-    '/Images/femme1.jpg',
-    '/Images/femme2.jpg',
-    '/Images/femme3.jpg',
-    '/Images/femme4.jpg',
-    '/Images/femme5.jpg',
+    '/photos/femme1.jpg',
+    '/photos/femme2.jpg',
+    '/photos/femme3.jpg',
+    '/photos/femme4.jpg',
+    '/photos/femme5.jpg',
+    '/photos/femme6.jpg',
   ],
-    
   homme: [
-    '/Images/homme1.jpg',
-    '/Images/homme2.jpg',
-    '/Images/homme3.jpg',
-    '/Images/homme4.jpg',
-    '/Images/homme5.jpg',
-    '/Images/homme6.jpg',
-    '/Images/homme7.jpg',
-    '/Images/homme8.jpg',
-    '/Images/homme9.jpg',
-    '/Images/homme10.jpg',
-
+    '/photos/homme1.jpg',
+    '/photos/homme2.jpg',
+    '/photos/homme3.jpg',
+    '/photos/homme4.jpg',
+    '/photos/homme5.jpg',
+    '/photos/homme6.jpg',
+    '/photos/homme7.jpg',
+    '/photos/homme8.jpg',
+    '/photos/homme9.jpg',
+    '/photos/homme10.jpg',
   ],
   enfant: [
-    '/Images/enfant1.jpg',
-    '/Images/enfant2.jpg',
-    '/Images/enfant3.jpg',
-    '/Images/enfant4.jpg',
-    '/Images/enfant5.jpg',
-    '/Images/enfant6.jpg',
+    '/photos/enfant1.jpg',
+    '/photos/enfant2.jpg',
+    '/photos/enfant3.jpg',
+    '/photos/enfant4.jpg',
+    '/photos/enfant5.jpg',
+    '/photos/enfant6.jpg',
   ],
 };
 
