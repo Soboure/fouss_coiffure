@@ -18,19 +18,19 @@ const services = {
 };
 
 const gallery = [
-  '/images/homme1.jpg',
-  '/images/homme2.jpg',
-  '/images/homme3.jpg',
-  '/images/femme2.jpg',
-  '/images/enfant1.jpg',
-  '/images/enfant2.jpg',
+  '/Images/homme1.jpg',
+  '/Images/homme2.jpg',
+  '/Images/homme3.jpg',
+  '/Images/femme2.jpg',
+  '/Images/enfant1.jpg',
+  '/Images/enfant2.jpg',
 ];
 
 const team = [
-  { name: 'Aïcha', role: 'Directrice & Experte Tresses', image: 'https://images.unsplash.com/photo-1531123897727-8f129e1bfa82?q=80&w=800&auto=format&fit=crop' },
-  { name: 'Ibrahim', role: 'Maître Barbier', image: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?q=80&w=800&auto=format&fit=crop' },
-  { name: 'Fatou', role: 'Spécialiste Soins Nappy', image: 'https://images.unsplash.com/photo-1531384441138-2736e62e0919?q=80&w=800&auto=format&fit=crop' },
-  { name: 'Kader', role: 'Coiffeur Visagiste', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop' },
+  { name: 'Soboure', role: 'Directeur & Expert', image: '/Images/expert1.jpg' },
+  { name: 'Ibrahim', role: 'Maître Barbier', image: '/Images/expert2.jpg' },
+  { name: 'Fadel', role: 'Spécialiste Soins Nappy', image: '/Images/expert3.jpg' },
+  { name: 'Kader', role: 'Coiffeur Visagiste', image: '/Images/expert4.jpg' },
 ];
 
 export default function MainSite() {
