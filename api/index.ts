@@ -9,11 +9,13 @@ console.log("Database mode detected:", usePostgres ? "Postgres" : "SQLite");
 let db: any;
 
 // Initialize database
+let isInitialized = false;
 const initDb = async () => {
+  if (isInitialized) return;
+  
   if (!usePostgres) {
-    console.warn("POSTGRES_URL not found. Falling back to SQLite (will not work on Vercel).");
+    console.warn("POSTGRES_URL not found. Falling back to SQLite.");
     try {
-      // Dynamic import to avoid loading better-sqlite3 on Vercel where it might fail
       const { default: Database } = await import('better-sqlite3');
       db = new Database('salon.db');
       db.exec(`
@@ -29,6 +31,7 @@ const initDb = async () => {
           createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      isInitialized = true;
       console.log("SQLite table checked/created");
     } catch (e) {
       console.error("SQLite init error:", e);
@@ -48,6 +51,7 @@ const initDb = async () => {
           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `;
+      isInitialized = true;
       console.log("Postgres table checked/created");
     } catch (err) {
       console.error("Postgres init error:", err);
@@ -55,16 +59,13 @@ const initDb = async () => {
   }
 };
 
-// Call initDb
-initDb();
-
 app.get('/api/reservations', async (req, res) => {
   try {
+    await initDb();
     if (usePostgres) {
       const { rows } = await sql`SELECT * FROM reservations ORDER BY date DESC, time DESC`;
       res.json(rows);
     } else {
-      if (!db) await initDb();
       const stmt = db.prepare('SELECT * FROM reservations ORDER BY date DESC, time DESC');
       res.json(stmt.all());
     }
@@ -76,6 +77,7 @@ app.get('/api/reservations', async (req, res) => {
 
 app.post('/api/reservations', async (req, res) => {
   try {
+    await initDb();
     const { service, date, time, space, clientName, clientPhone } = req.body;
     
     if (!service || !date || !time || !clientName || !clientPhone) {
@@ -90,9 +92,7 @@ app.post('/api/reservations', async (req, res) => {
       `;
       res.json({ id: rows[0].id, success: true });
     } else {
-      if (!db) await initDb();
       if (!db) throw new Error('SQLite database not initialized');
-      
       const stmt = db.prepare('INSERT INTO reservations (service, date, time, space, clientName, clientPhone) VALUES (?, ?, ?, ?, ?, ?)');
       const info = stmt.run(service, date, time, space || 'Standard', clientName, clientPhone);
       res.json({ id: info.lastInsertRowid, success: true });
@@ -102,7 +102,7 @@ app.post('/api/reservations', async (req, res) => {
     res.status(500).json({ 
       error: 'Failed to create reservation', 
       details: err.message,
-      hint: !usePostgres ? 'POSTGRES_URL is missing. SQLite is not supported on Vercel. Please connect a Vercel Postgres database in your project settings.' : 'Check your database connection and table schema.'
+      hint: !usePostgres ? 'POSTGRES_URL is missing.' : 'Check your database connection.'
     });
   }
 });
