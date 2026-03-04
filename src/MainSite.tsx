@@ -18,19 +18,19 @@ const services = {
 };
 
 const gallery = [
-  '/photos/homme1.jpg',
-  '/photos/homme2.jpg',
-  '/photos/homme3.jpg',
-  '/photos/femme2.jpg',
-  '/photos/enfant1.jpg',
-  '/photos/enfant2.jpg',
+  '/galerie/femme1.jpg',
+  '/galerie/homme1.jpg',
+  '/galerie/enfant1.jpg',
+  '/galerie/femme2.jpg',
+  '/galerie/homme2.jpg',
+  '/galerie/enfant2.jpg',
 ];
 
 const team = [
-  { name: 'Soboure', role: 'Directeur & Expert', image: '/photos/expert1.jpg' },
-  { name: 'Ibrahim', role: 'Maître Barbier', image: '/photos/expert2.jpg' },
-  { name: 'Fadel', role: 'Spécialiste Soins Nappy', image: '/photos/expert3.jpg' },
-  { name: 'Kader', role: 'Coiffeur Visagiste', image: '/photos/expert4.jpg' },
+  { name: 'Aïcha', role: 'Directeur & Experte Tresses', image: '/galerie/expert1.jpg' },
+  { name: 'Ibrahim', role: 'Maître Barbier', image: '/galerie/expert2.jpg' },
+  { name: 'Fatou', role: 'Spécialiste Soins Nappy', image: '/galerie/expert3.jpg' },
+  { name: 'Kader', role: 'Coiffeur Visagiste', image: '/galerie/expert4.jpg' },
 ];
 
 export default function MainSite() {
@@ -78,9 +78,17 @@ export default function MainSite() {
       });
       if (res.ok) {
         setBookingStatus('success');
+      } else {
+        const errorData = await res.json();
+        console.error('Booking error:', errorData);
+        const detailMsg = errorData.details ? `\nDétails: ${errorData.details}` : '';
+        const hintMsg = errorData.hint ? `\nConseil: ${errorData.hint}` : '';
+        alert(`Erreur lors de la réservation: ${errorData.error}${detailMsg}${hintMsg}`);
+        setBookingStatus('idle');
       }
     } catch (err) {
-      console.error(err);
+      console.error('Fetch error:', err);
+      alert('Une erreur est survenue. Veuillez réessayer plus tard.');
       setBookingStatus('idle');
     }
   };
@@ -124,7 +132,7 @@ export default function MainSite() {
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16">
           <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight drop-shadow-lg">
-            L'Excellence <br/><span className="italic font-light text-[#D4AF37]">à votre mesure</span>
+            L'Élégance <br/><span className="italic font-light text-[#D4AF37]">au Naturel</span>
           </h1>
           <p className="text-lg text-white/90 mb-10 drop-shadow-md">Le salon de référence à Cotonou. Espace Standard & Suite VIP.</p>
           <button onClick={() => scrollTo('booking')} className="bg-[#D4AF37] text-[#2A2A2A] px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase hover:bg-white transition-colors shadow-xl hover:scale-105 transform duration-300">
@@ -145,7 +153,7 @@ export default function MainSite() {
             ))}
           </div>
           <div className="text-center">
-            <Link to="/galerie" className="inline-flex items-center text-[#8C7A6B] font-medium hover:underline group">
+            <Link to="/realisations" className="inline-flex items-center text-[#8C7A6B] font-medium hover:underline group">
               Voir toute la galerie
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
