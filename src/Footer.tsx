@@ -6,7 +6,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="bg-warm-900 text-white pt-16 pb-12 border-t border-warm-800">
+      <footer className="bg-charcoal text-white pt-16 pb-12 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 text-center md:text-left">
             {/* Left Column: Brand */}
@@ -15,53 +15,53 @@ export default function Footer() {
                 <span className="font-display text-3xl font-black tracking-tight text-white leading-none">
                   FOUSS
                 </span>
-                <span className="font-sans text-[0.6rem] tracking-[0.3em] text-gold-400 uppercase font-semibold mt-1">
-                  Coiffure
+                <span className="font-sans text-[0.6rem] tracking-[0.3em] text-gold-light uppercase font-bold mt-1">
+                  Maison de Beauté
                 </span>
               </div>
-              <p className="text-warm-400 text-sm max-w-xs leading-relaxed">
-                Le salon de coiffure de référence à Cotonou pour sublimer votre beauté naturelle dans un cadre raffiné.
+              <p className="text-creme/70 text-xs md:text-sm max-w-xs leading-relaxed font-light">
+                Maison de Beauté et concept showroom exclusif à Cotonou. Découvrez le bien-être capillaire et corporel ultime.
               </p>
             </div>
 
             {/* Middle Column: Schedule */}
             <div className="flex flex-col items-center justify-center">
-              <h4 className="text-gold-400 font-serif text-lg font-semibold mb-4 flex items-center gap-2 justify-center">
+              <h4 className="text-gold-light font-serif text-lg font-semibold mb-4 flex items-center gap-2 justify-center">
                 <Clock size={16} />
                 <span>Horaires d'Ouverture</span>
               </h4>
-              <p className="text-warm-300 text-sm leading-loose">
-                Lundi - Samedi : 9h00 - 20h00
+              <p className="text-creme/80 text-sm leading-loose">
+                Lundi - Samedi : 09h00 - 20h00
               </p>
-              <p className="text-warm-500 text-xs mt-2 italic">
-                Dimanche : Fermé (Uniquement sur réservation VIP spéciale)
+              <p className="text-creme/50 text-xs mt-2 italic">
+                Dimanche : Fermé (Uniquement sur événement VIP)
               </p>
             </div>
 
             {/* Right Column: Contact & Address */}
             <div className="flex flex-col items-center md:items-end justify-center md:justify-start">
-              <h4 className="text-gold-400 font-serif text-lg font-semibold mb-4 flex items-center gap-2 md:flex-row-reverse justify-center md:justify-start">
+              <h4 className="text-gold-light font-serif text-lg font-semibold mb-4 flex items-center gap-2 md:flex-row-reverse justify-center md:justify-start">
                 <MapPin size={16} />
                 <span>Nous Trouver</span>
               </h4>
-              <p className="text-warm-300 text-sm mb-2 text-center md:text-right">
+              <p className="text-creme/80 text-sm mb-2 text-center md:text-right">
                 Haie Vive, Avenue Jean-Paul II, Cotonou, Bénin
               </p>
               <a
                 href="https://wa.me/22957985073"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gold-400 text-warm-300 transition-colors flex items-center gap-2 text-sm mt-2 font-medium"
+                className="hover:text-gold-light text-creme/80 transition-colors flex items-center gap-2 text-sm mt-2 font-medium"
               >
                 <Phone size={16} className="text-green-400" />
-                <span>WhatsApp: +229 57 98 50 73</span>
+                <span>WhatsApp : +229 57 98 50 73</span>
               </a>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-warm-800 text-center text-xs text-warm-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="pt-8 border-t border-white/5 text-center text-xs text-creme/40 flex flex-col sm:flex-row justify-between items-center gap-4">
             <p>© {currentYear} Fouss Coiffure. Tous droits réservés.</p>
-            <p>Conçu avec élégance à Cotonou.</p>
+            <p className="font-light">Maison de Beauté & Lifestyle.</p>
           </div>
         </div>
       </footer>

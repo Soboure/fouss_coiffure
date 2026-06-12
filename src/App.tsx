@@ -4,6 +4,9 @@ import MainSite from './MainSite';
 import AdminDashboard from './AdminDashboard';
 import TarifsPage from './TarifsPage';
 import Galerie from './Galerie';
+import GalerieFemme from './GalerieFemme';
+import GalerieHomme from './GalerieHomme';
+import GalerieEnfant from './GalerieEnfant';
 
 // Helper component to handle smooth scroll on hash change or page change
 function ScrollToAnchor() {
@@ -36,10 +39,14 @@ export default function App() {
         <Route path="/" element={<MainSite />} />
         <Route path="/tarifs" element={<TarifsPage />} />
         <Route path="/galerie" element={<Galerie />} />
+        <Route path="/galerie/femmes" element={<GalerieFemme />} />
+        <Route path="/galerie/hommes" element={<GalerieHomme />} />
+        <Route path="/galerie/enfants" element={<GalerieEnfant />} />
         <Route path="/realisations" element={<Galerie />} />
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </>
   );
 }
+
 

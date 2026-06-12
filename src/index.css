@@ -6,32 +6,21 @@
   --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   
-  --color-gold-50: #fbf8eb;
-  --color-gold-100: #f5eed0;
-  --color-gold-200: #eadca1;
-  --color-gold-300: #dcc46d;
-  --color-gold-400: #cfa840;
-  --color-gold-500: #b8902d;
-  --color-gold-600: #9c7322;
-  --color-gold-700: #7d571b;
-  --color-gold-800: #62431a;
-  --color-gold-900: #513619;
+  /* Accessible Color Palette */
+  --color-gold-light: #C9A84C;  /* Only for dark backgrounds */
+  --color-gold-dark: #7A5F1A;   /* For text/links on light backgrounds */
   
-  --color-warm-50: #FCFBF9;
-  --color-warm-100: #F8F7F4;
-  --color-warm-200: #E5E3DC;
-  --color-warm-300: #C5C1B4;
-  --color-warm-400: #A8A394;
-  --color-warm-500: #8C7A6B;
-  --color-warm-600: #736356;
-  --color-warm-700: #5C4E43;
-  --color-warm-800: #4A4238;
-  --color-warm-900: #2A2A2A;
+  --color-charcoal: #2C2B28;    /* Main dark text / backgrounds */
+  --color-warm-brown: #5A5140;  /* Secondary text / body alternative */
+  --color-taupe: #7A6E5E;       /* Labels, metadata, subtle text */
+  --color-sable: #E8E0D0;       /* Borders and dividers */
+  --color-creme: #F8F7F4;       /* Main light background */
 }
 
 body {
-  background-color: var(--color-warm-100);
-  color: var(--color-warm-900);
+  background-color: var(--color-creme);
+  color: var(--color-charcoal);
+  font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
@@ -42,14 +31,14 @@ html {
 
 /* Glassmorphism custom classes */
 .glass-panel {
-  background: rgba(248, 247, 244, 0.75);
+  background: rgba(248, 247, 244, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(229, 227, 220, 0.6);
+  border: 1px solid var(--color-sable);
 }
 
 .glass-panel-dark {
-  background: rgba(42, 42, 42, 0.75);
+  background: rgba(44, 43, 40, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -57,21 +46,21 @@ html {
 
 /* Gold Gradient text and effects */
 .gold-gradient-text {
-  background: linear-gradient(135deg, #dcc46d 0%, #b8902d 50%, #9c7322 100%);
+  background: linear-gradient(135deg, #C9A84C 0%, #7A5F1A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gold-gradient-bg {
-  background: linear-gradient(135deg, #eadca1 0%, #b8902d 100%);
+  background: linear-gradient(135deg, #C9A84C 0%, #7A5F1A 100%);
 }
 
 .gold-glow {
-  box-shadow: 0 0 20px rgba(184, 144, 45, 0.2);
+  box-shadow: 0 0 20px rgba(122, 95, 26, 0.15);
 }
 
 .gold-glow-hover:hover {
-  box-shadow: 0 0 30px rgba(184, 144, 45, 0.35);
+  box-shadow: 0 0 30px rgba(122, 95, 26, 0.25);
 }
 
 /* Custom scrollbar */
@@ -80,13 +69,14 @@ html {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-warm-100);
+  background: var(--color-creme);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-warm-300);
+  background: var(--color-sable);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-warm-500);
+  background: var(--color-taupe);
 }
+
 

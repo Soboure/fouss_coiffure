@@ -1,67 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { Users, User, Baby, X, Maximize2, Sparkles, Calendar } from 'lucide-react';
+import { Sparkles, X, Maximize2, Scissors, Heart, ShoppingBag, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
 const categories = [
-  { id: 'femme', label: 'Femmes', icon: Users },
-  { id: 'homme', label: 'Hommes', icon: User },
-  { id: 'enfant', label: 'Enfants', icon: Baby },
+  { id: 'coiffure', label: 'Haute Coiffure', icon: Scissors },
+  { id: 'soins', label: 'Spa & Esthétique', icon: Heart },
+  { id: 'mode', label: 'Showroom Mode', icon: ShoppingBag },
 ];
 
 const galleryData = {
-  femme: [
-    '/galerie/femme1.jpg',
-    '/galerie/femme2.jpg',
-    '/galerie/femme3.jpg',
-    '/galerie/femme4.jpg',
-    '/galerie/femme5.jpg',
-    '/galerie/femme6.jpg',
+  soins: [
+    { src: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800', title: 'Massage aux Pierres Chaudes', desc: 'Massage corporel décontractant pour libérer le stress.' },
+    { src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=800', title: 'Soin Visage Hydratant', desc: 'Purification cutanée et masque hydratant régénérant.' },
+    { src: '/galerie/expert3.jpg', title: 'Rituel Capillaire & Huiles', desc: 'Soin profond du cuir chevelu par nos esthéticiennes.' },
+    { src: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=800', title: 'Aromathérapie Capillaire', desc: 'Application d\'huiles précieuses bio pour la fibre.' },
+    { src: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800', title: 'Espace Détente & Bain', desc: 'Atmosphère calme pour vos rituels spa.' }
   ],
-  homme: [
-    '/galerie/homme1.jpg',
-    '/galerie/homme2.jpg',
-    '/galerie/homme3.jpg',
-    '/galerie/homme4.jpg',
-    '/galerie/homme5.jpg',
-    '/galerie/homme6.jpg',
-  ],
-  enfant: [
-    '/galerie/enfant1.jpg',
-    '/galerie/enfant2.jpg',
-    '/galerie/enfant3.jpg',
-    '/galerie/enfant4.jpg',
-    '/galerie/enfant5.jpg',
-    '/galerie/enfant6.jpg',
-  ],
+  mode: [
+    { src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800', title: 'Le Showroom Concept', desc: 'Notre espace d\'exposition prêt-à-porter à la Haie Vive.' },
+    { src: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800', title: 'Robes de Créateurs', desc: 'Pièces uniques sélectionnées pour vos événements.' },
+    { src: 'https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=800', title: 'Accessoires de Mode', desc: 'Maroquinerie fine et bijoux d\'artisans créateurs.' },
+    { src: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=800', title: 'Prêt-à-Porter Masculin', desc: 'Ensembles en lin et tenues élégantes de créateurs.' }
+  ]
 };
 
-export default function GalleryPage() {
-  const [activeCategory, setActiveCategory] = useState<'femme' | 'homme' | 'enfant'>('femme');
-  const [selectedImg, setSelectedImg] = useState<string | null>(null);
+export default function Galerie() {
+  const [activeCategory, setActiveCategory] = useState<'coiffure' | 'soins' | 'mode'>('coiffure');
+  const [selectedImg, setSelectedImg] = useState<{ src: string, title: string, desc: string } | null>(null);
 
-  // Close lightbox on escape keypress
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setSelectedImg(null);
-      }
+      if (e.key === 'Escape') setSelectedImg(null);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
-    <div className="min-h-screen bg-warm-100 text-warm-900 font-sans flex flex-col justify-between">
+    <div className="min-h-screen bg-creme text-charcoal font-sans flex flex-col justify-between">
       <div>
         <Navbar />
 
-        {/* Header Section */}
-        <section className="relative py-24 bg-warm-900 text-white overflow-hidden mt-[73px]">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] z-0"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-warm-900 via-warm-900/80 to-transparent z-0"></div>
+        {/* Header - White on Charcoal */}
+        <section className="relative py-24 bg-charcoal text-white overflow-hidden mt-[73px]">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px] z-0"></div>
           
           <div className="max-w-7xl mx-auto px-6 relative z-10 text-center md:text-left">
             <motion.div
@@ -69,21 +54,20 @@ export default function GalleryPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <span className="text-gold-400 text-xs font-bold tracking-widest uppercase">Galerie Photo</span>
-              <h1 className="text-4xl md:text-5xl font-serif font-bold mt-2">Nos Réalisations</h1>
-              <p className="text-warm-400 text-sm md:text-base mt-4 max-w-xl leading-relaxed">
-                Explorez nos plus belles créations. Des tresses élaborées aux dégradés masculins impeccables, 
-                chaque coiffure est une œuvre unique réalisée avec passion.
+              <span className="text-gold-light text-xs font-bold tracking-widest uppercase">Galerie Visuelle</span>
+              <h1 className="text-4xl md:text-5xl font-serif font-bold mt-2">Maison Fouss en Images</h1>
+              <p className="text-creme/80 text-sm md:text-base mt-4 max-w-xl leading-relaxed font-light">
+                Parcourez nos réalisations : l'art capillaire protecteur, l'apaisement de nos soins esthétiques et l'inspiration mode de notre showroom.
               </p>
             </motion.div>
           </div>
         </section>
 
-        {/* Gallery Content */}
+        {/* Content */}
         <main className="max-w-7xl mx-auto px-6 py-16">
-          {/* Category Selector */}
-          <div className="flex justify-center mb-12">
-            <div className="bg-white p-1.5 rounded-full shadow-sm border border-warm-200 flex space-x-1">
+          {/* Category Filter Pills */}
+          <div className="flex justify-center mb-12 overflow-x-auto pb-4 scrollbar-none">
+            <div className="bg-white p-1.5 rounded-full shadow-sm border border-sable flex space-x-1 shrink-0">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 const isSelected = activeCategory === cat.id;
@@ -91,10 +75,10 @@ export default function GalleryPage() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id as any)}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs md:text-sm font-semibold tracking-wide transition-all relative ${
+                    className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs md:text-sm font-semibold tracking-wide transition-all ${
                       isSelected
-                        ? 'bg-warm-850 text-white shadow-md'
-                        : 'text-warm-600 hover:text-warm-900 hover:bg-warm-100'
+                        ? 'bg-charcoal text-white shadow-md'
+                        : 'text-warm-brown hover:text-gold-dark hover:bg-creme'
                     }`}
                   >
                     <Icon size={14} />
@@ -105,49 +89,118 @@ export default function GalleryPage() {
             </div>
           </div>
 
-          {/* Gallery Grid */}
+          {/* Grid Display */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeCategory}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.3 }}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
             >
-              {galleryData[activeCategory].map((img, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  onClick={() => setSelectedImg(img)}
-                  className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-warm-200 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-                >
-                  <img
-                    src={img}
-                    alt={`${activeCategory} style`}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  {/* Hover Overlay with Icon */}
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="bg-white/20 backdrop-blur-md p-4 rounded-full border border-white/30 text-white scale-75 group-hover:scale-100 transition-transform duration-300 shadow-lg">
-                      <Maximize2 size={20} />
+              {activeCategory === 'coiffure' ? (
+                <>
+                  {/* Card Femmes */}
+                  <div className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-sable flex flex-col justify-end p-8">
+                    <img 
+                      src="/galerie/femme1.jpg" 
+                      alt="Coiffure Femmes" 
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/40 to-transparent z-0"></div>
+                    <div className="relative z-10 text-white">
+                      <span className="text-gold-light text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                        <Sparkles size={10} />
+                        <span>Créativité & Protection</span>
+                      </span>
+                      <h3 className="text-2xl font-serif font-bold mb-2 text-white">Coiffure Femmes</h3>
+                      <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Nattes artistiques, tresses collées, perruques et soins profonds nappy.</p>
+                      <Link 
+                        to="/galerie/femmes" 
+                        className="inline-flex items-center justify-center bg-gold-light text-charcoal py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
+                      >
+                        Découvrir la Galerie
+                      </Link>
                     </div>
                   </div>
 
-                  {/* Caption badge */}
-                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm py-2.5 px-4 rounded-2xl border border-warm-200/50 shadow-sm opacity-90 group-hover:opacity-100 transition-opacity">
-                    <p className="text-[10px] font-bold text-warm-800 uppercase tracking-widest text-center flex items-center justify-center gap-1.5">
-                      <Sparkles size={10} className="text-gold-500" />
-                      <span>
-                        {activeCategory === 'femme' ? 'Création Féminine' : activeCategory === 'homme' ? 'Création Masculine' : 'Style Enfant'}
+                  {/* Card Hommes */}
+                  <div className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-sable flex flex-col justify-end p-8">
+                    <img 
+                      src="/galerie/homme1.jpg" 
+                      alt="Coiffure Hommes" 
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/40 to-transparent z-0"></div>
+                    <div className="relative z-10 text-white">
+                      <span className="text-gold-light text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                        <Sparkles size={10} />
+                        <span>Précision & Style</span>
                       </span>
-                    </p>
+                      <h3 className="text-2xl font-serif font-bold mb-2 text-white">Coiffure Hommes</h3>
+                      <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Dégradés américains, tailles de barbe à l'ancienne et rituels visagistes.</p>
+                      <Link 
+                        to="/galerie/hommes" 
+                        className="inline-flex items-center justify-center bg-gold-light text-charcoal py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
+                      >
+                        Découvrir la Galerie
+                      </Link>
+                    </div>
                   </div>
-                </motion.div>
-              ))}
+
+                  {/* Card Enfants */}
+                  <div className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-sable flex flex-col justify-end p-8">
+                    <img 
+                      src="/galerie/enfant1.jpg" 
+                      alt="Coiffure Enfants" 
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/40 to-transparent z-0"></div>
+                    <div className="relative z-10 text-white">
+                      <span className="text-gold-light text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                        <Sparkles size={10} />
+                        <span>Douceur & Confort</span>
+                      </span>
+                      <h3 className="text-2xl font-serif font-bold mb-2 text-white">Coiffure Enfants</h3>
+                      <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Coupes garçons rapides et tresses douces protectrices pour fillettes.</p>
+                      <Link 
+                        to="/galerie/enfants" 
+                        className="inline-flex items-center justify-center bg-gold-light text-charcoal py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
+                      >
+                        Découvrir la Galerie
+                      </Link>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                galleryData[activeCategory as 'soins' | 'mode'].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    onClick={() => setSelectedImg(item)}
+                    className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-sable cursor-pointer hover:shadow-md transition-all duration-300"
+                  >
+                    <img
+                      src={item.src}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-charcoal/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="bg-white/95 text-charcoal p-3.5 rounded-full border border-sable scale-75 group-hover:scale-100 transition-all duration-300 shadow-md">
+                        <Eye size={18} className="text-gold-dark" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-4 left-4 right-4 bg-white p-4 rounded-2xl border border-sable/50 shadow-sm">
+                      <h4 className="text-sm font-bold text-charcoal font-serif">{item.title}</h4>
+                      <p className="text-[11px] text-taupe mt-1 truncate">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))
+              )}
             </motion.div>
           </AnimatePresence>
         </main>
@@ -160,32 +213,35 @@ export default function GalleryPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-charcoal/95 flex items-center justify-center p-4 backdrop-blur-sm"
             onClick={() => setSelectedImg(null)}
           >
-            {/* Close button */}
             <button
               onClick={() => setSelectedImg(null)}
-              className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full border border-white/10 transition-colors z-50"
+              className="absolute top-6 right-6 text-creme/70 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full border border-white/10 transition-colors z-50"
               aria-label="Fermer"
             >
               <X size={24} />
             </button>
 
-            {/* Image display container */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="relative max-w-4xl max-h-[85vh] overflow-hidden rounded-3xl border border-white/10 shadow-2xl flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative max-w-4xl max-h-[85vh] bg-charcoal rounded-3xl border border-white/10 shadow-2xl flex flex-col overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
             >
-              <img
-                src={selectedImg}
-                alt="Coiffure grand format"
-                className="max-w-full max-h-[85vh] object-contain"
-              />
+              <div className="overflow-hidden flex items-center justify-center bg-black max-h-[65vh]">
+                <img
+                  src={selectedImg.src}
+                  alt={selectedImg.title}
+                  className="max-w-full max-h-[65vh] object-contain"
+                />
+              </div>
+              <div className="bg-charcoal p-6 text-white border-t border-white/10">
+                <h3 className="text-xl font-serif font-bold text-gold-light">{selectedImg.title}</h3>
+                <p className="text-creme/75 text-sm mt-1.5 leading-relaxed">{selectedImg.desc}</p>
+              </div>
             </motion.div>
           </motion.div>
         )}
