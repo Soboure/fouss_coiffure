@@ -1,23 +1,22 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Download } from 'lucide-react';
+import { CheckCircle, Download, Sparkles, User, Calendar, Clock, ArrowRight, ArrowLeft } from 'lucide-react';
 import html2canvas from 'html2canvas';
+import { motion, AnimatePresence } from 'motion/react';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 // --- DATA ---
-const services = {
-  femme: [
-    { name: 'Tresses Africaines', price: '15 000 FCFA', duration: '2h - 4h' },
-    { name: 'Tissage & Perruque', price: '20 000 FCFA', duration: '2h' },
-    { name: 'Soin Profond Nappy', price: '10 000 FCFA', duration: '1h' },
-  ],
-  homme: [
-    { name: 'Coupe Dégradé', price: '3 000 FCFA', duration: '30 min' },
-    { name: 'Taille de Barbe', price: '2 000 FCFA', duration: '20 min' },
-    { name: 'Forfait VIP Homme', price: '10 000 FCFA', duration: '1h' },
-  ]
-};
+const services = [
+  { id: 'tresses', name: 'Tresses Africaines', price: '15 000 FCFA', duration: '2h - 4h', desc: 'Tresses traditionnelles ou modernes réalisées avec soin.' },
+  { id: 'tissage', name: 'Tissage & Perruque', price: '20 000 FCFA', duration: '2h', desc: 'Pose professionnelle de mèches et confection de perruques.' },
+  { id: 'nappy', name: 'Soin Profond Nappy', price: '10 000 FCFA', duration: '1h', desc: 'Traitement hydratant et nourrissant pour cheveux naturels.' },
+  { id: 'degrade', name: 'Coupe Dégradé (Homme)', price: '3 000 FCFA', duration: '30 min', desc: 'Coupe moderne et finitions précises.' },
+  { id: 'barbe', name: 'Taille de Barbe', price: '2 000 FCFA', duration: '20 min', desc: 'Traçage et entretien de votre barbe avec soins chauds.' },
+  { id: 'vip-forfait', name: 'Forfait VIP Homme', price: '10 000 FCFA', duration: '1h', desc: 'Shampoing, coupe, barbe, massage du cuir chevelu.' },
+];
 
-const gallery = [
+const galleryPreview = [
   '/galerie/femme1.jpg',
   '/galerie/homme1.jpg',
   '/galerie/enfant1.jpg',
@@ -27,16 +26,15 @@ const gallery = [
 ];
 
 const team = [
-  { name: 'Aïcha', role: 'Directeur & Experte Tresses', image: '/galerie/expert1.jpg' },
-  { name: 'Ibrahim', role: 'Maître Barbier', image: '/galerie/expert2.jpg' },
-  { name: 'Fatou', role: 'Spécialiste Soins Nappy', image: '/galerie/expert3.jpg' },
-  { name: 'Kader', role: 'Coiffeur Visagiste', image: '/galerie/expert4.jpg' },
+  { name: 'Aïcha', role: 'Directrice & Experte Tresses', image: '/galerie/expert1.jpg', bio: 'Plus de 10 ans d\'expérience dans les tresses artistiques.' },
+  { name: 'Ibrahim', role: 'Maître Barbier', image: '/galerie/expert2.jpg', bio: 'Spécialiste des dégradés américains et soins de la barbe.' },
+  { name: 'Fatou', role: 'Spécialiste Soins Nappy', image: '/galerie/expert3.jpg', bio: 'Experte des textures crépues et soins capillaires bio.' },
+  { name: 'Kader', role: 'Coiffeur Visagiste', image: '/galerie/expert4.jpg', bio: 'Créateur de styles sur-mesure adaptés à votre visage.' },
 ];
 
 export default function MainSite() {
-  const [activeTab, setActiveTab] = useState<'femme' | 'homme'>('femme');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [currentStep, setCurrentStep] = useState(1);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -47,21 +45,21 @@ export default function MainSite() {
 
   const downloadTicket = async () => {
     if (ticketRef.current) {
-      const canvas = await html2canvas(ticketRef.current, {
-        scale: 2,
-        backgroundColor: '#F8F7F4'
+      // Temporarily remove shadow for printing
+      const element = ticketRef.current;
+      element.style.boxShadow = 'none';
+      const canvas = await html2canvas(element, {
+        scale: 3,
+        backgroundColor: '#F8F7F4',
+        useCORS: true
       });
+      element.style.boxShadow = '';
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = image;
       link.download = `Ticket_Fouss_Coiffure_${formData.firstName}_${formData.lastName}.png`;
       link.click();
     }
-  };
-
-  const scrollTo = (id: string) => {
-    setIsMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleBook = async (e: React.FormEvent) => {
@@ -81,9 +79,7 @@ export default function MainSite() {
       } else {
         const errorData = await res.json();
         console.error('Booking error:', errorData);
-        const detailMsg = errorData.details ? `\nDétails: ${errorData.details}` : '';
-        const hintMsg = errorData.hint ? `\nConseil: ${errorData.hint}` : '';
-        alert(`Erreur lors de la réservation: ${errorData.error}${detailMsg}${hintMsg}`);
+        alert(`Erreur lors de la réservation: ${errorData.error || 'Erreur inconnue'}`);
         setBookingStatus('idle');
       }
     } catch (err) {
@@ -93,28 +89,33 @@ export default function MainSite() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#F8F7F4] text-[#2A2A2A] font-sans">
-      {/* Navbar */}
-      <nav className="fixed w-full z-50 bg-[#F8F7F4]/90 backdrop-blur-md border-b border-[#E5E3DC] py-4">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div className="flex flex-col items-center justify-center cursor-pointer" onClick={() => scrollTo('home')}>
-            <span className="font-display text-3xl font-black tracking-tight text-[#2A2A2A] leading-none">FOUSS</span>
-            <span className="font-sans text-[0.6rem] tracking-[0.3em] text-[#8C7A6B] uppercase font-medium mt-1">Coiffure</span>
-          </div>
-          <div className="hidden md:flex space-x-8 items-center">
-            <button onClick={() => scrollTo('home')} className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">Accueil</button>
-            <Link to="/tarifs" className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">Tarifs</Link>
-            <Link to="/galerie" className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">Galerie</Link>
-            <button onClick={() => scrollTo('team')} className="text-sm font-medium text-[#6B6358] hover:text-[#8C7A6B]">L'Équipe</button>
-            <button onClick={() => scrollTo('booking')} className="bg-[#8C7A6B] text-white px-6 py-2 rounded-full text-sm hover:bg-[#736356]">Réserver</button>
-          </div>
-        </div>
-      </nav>
+  const nextStep = () => {
+    if (currentStep === 1 && !formData.service) {
+      alert('Veuillez sélectionner une prestation.');
+      return;
+    }
+    if (currentStep === 2 && (!formData.date || !formData.time)) {
+      alert('Veuillez choisir une date et une heure.');
+      return;
+    }
+    setCurrentStep(currentStep + 1);
+  };
 
-      {/* Hero */}
+  const prevStep = () => {
+    setCurrentStep(currentStep - 1);
+  };
+
+  const getSelectedServiceDetails = () => {
+    return services.find(s => s.name === formData.service);
+  };
+
+  return (
+    <div className="min-h-screen bg-warm-100 text-warm-900 font-sans">
+      <Navbar />
+
+      {/* Hero Section */}
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* 3D Video Background */}
+        {/* Background Video */}
         <div className="absolute inset-0 z-0">
           <video 
             autoPlay 
@@ -125,234 +126,510 @@ export default function MainSite() {
           >
             <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-background-of-a-golden-wave-3165-large.mp4" type="video/mp4" />
           </video>
-          {/* Overlays for readability and blending with the page */}
-          <div className="absolute inset-0 bg-black/40"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#F8F7F4] via-transparent to-transparent"></div>
+          {/* Elegant Overlays */}
+          <div className="absolute inset-0 bg-black/55 backdrop-blur-[1px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-warm-100 via-transparent to-black/30"></div>
         </div>
 
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16">
-          <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight drop-shadow-lg">
-            L'Élégance <br/><span className="italic font-light text-[#D4AF37]">au Naturel</span>
-          </h1>
-          <p className="text-lg text-white/90 mb-10 drop-shadow-md">Le salon de référence à Cotonou. Espace Standard & Suite VIP.</p>
-          <button onClick={() => scrollTo('booking')} className="bg-[#D4AF37] text-[#2A2A2A] px-8 py-4 rounded-full text-sm font-bold tracking-widest uppercase hover:bg-white transition-colors shadow-xl hover:scale-105 transform duration-300">
-            Prendre Rendez-vous
-          </button>
+        {/* Content */}
+        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16 flex flex-col items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-gold-200 text-xs font-semibold uppercase tracking-widest mb-6"
+          >
+            <Sparkles size={14} className="animate-pulse" />
+            <span>Le salon de référence à Cotonou</span>
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight"
+          >
+            L'Élégance <br/><span className="italic font-light text-gold-300">au Naturel</span>
+          </motion.h1>
+
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-lg md:text-xl text-warm-100/90 mb-10 max-w-2xl font-light"
+          >
+            Vivez une expérience capillaire d'exception. Espace Standard ou Suite VIP privative pour votre confort suprême.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <a 
+              href="#booking"
+              className="gold-gradient-bg gold-glow gold-glow-hover text-warm-900 px-10 py-5 rounded-full text-xs font-bold tracking-widest uppercase hover:scale-105 active:scale-95 transform transition-all duration-300 inline-block"
+            >
+              Prendre Rendez-vous
+            </a>
+          </motion.div>
         </div>
       </section>
 
-      {/* Gallery */}
-      <section id="gallery" className="py-20 bg-white">
+      {/* Gallery Section */}
+      <section id="gallery" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-serif font-bold text-[#4A4238] text-center mb-12">Nos Réalisations</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
-            {gallery.map((img, i) => (
-              <div key={i} className="aspect-[4/5] overflow-hidden rounded-2xl">
-                <img src={img} alt="Coiffure" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
-              </div>
+          <div className="text-center mb-16">
+            <span className="text-gold-600 text-xs font-bold tracking-widest uppercase">Portfolio</span>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-warm-800 mt-2">Nos Réalisations</h2>
+            <div className="w-16 h-1 bg-gold-500 mx-auto mt-4 rounded-full"></div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8 mb-16">
+            {galleryPreview.map((img, i) => (
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="aspect-[4/5] overflow-hidden rounded-3xl group relative shadow-md hover:shadow-xl border border-warm-200/50"
+              >
+                <img 
+                  src={img} 
+                  alt="Coiffure Fouss" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                  <span className="text-white text-sm font-medium tracking-wide">Fouss Coiffure</span>
+                </div>
+              </motion.div>
             ))}
           </div>
+
           <div className="text-center">
-            <Link to="/realisations" className="inline-flex items-center text-[#8C7A6B] font-medium hover:underline group">
-              Voir toute la galerie
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+            <Link 
+              to="/galerie" 
+              className="inline-flex items-center text-gold-600 font-semibold hover:text-gold-700 transition-colors group text-sm"
+            >
+              <span>Découvrir toute la galerie</span>
+              <ArrowRight size={16} className="ml-2 transform group-hover:translate-x-1.5 transition-transform" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Team */}
-      <section id="team" className="py-20 bg-[#F8F7F4]">
+      {/* Team Section */}
+      <section id="team" className="py-24 bg-warm-100">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-serif font-bold text-[#4A4238]">Nos Experts</h2>
-            <p className="text-[#6B6358] mt-4">Le savoir-faire à votre service</p>
+          <div className="text-center mb-20">
+            <span className="text-gold-600 text-xs font-bold tracking-widest uppercase">Savoir-faire</span>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-warm-800 mt-2">Nos Experts Créateurs</h2>
+            <p className="text-warm-600 mt-2 max-w-md mx-auto">Une équipe dévouée pour donner vie à vos envies capillaires.</p>
+            <div className="w-16 h-1 bg-gold-500 mx-auto mt-4 rounded-full"></div>
           </div>
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member, index) => (
-              <div key={index} className="text-center group">
-                <div className="relative overflow-hidden aspect-[3/4] mb-6 rounded-2xl">
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-white rounded-3xl p-4 shadow-sm border border-warm-200 hover:shadow-xl transition-all duration-300 group text-center"
+              >
+                <div className="relative overflow-hidden aspect-[3/4] mb-6 rounded-2xl shadow-inner">
                   <img 
                     src={member.image} 
                     alt={member.name} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
-                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <h3 className="text-xl font-serif font-bold text-[#4A4238] mb-1">{member.name}</h3>
-                <p className="text-sm text-[#8C7A6B] uppercase tracking-wider">{member.role}</p>
-              </div>
+                <h3 className="text-xl font-serif font-bold text-warm-800 mb-1">{member.name}</h3>
+                <p className="text-xs text-gold-600 uppercase tracking-widest font-semibold mb-3">{member.role}</p>
+                <p className="text-xs text-warm-500 px-2 leading-relaxed">{member.bio}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Booking */}
-      <section id="booking" className="py-20 bg-[#F8F7F4]">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="bg-white p-10 rounded-3xl shadow-sm border border-[#E5E3DC]">
-            <h2 className="text-3xl font-serif font-bold text-[#4A4238] mb-8 text-center">Réserver un moment</h2>
-            
+      {/* Booking Section with Multi-Step wizard */}
+      <section id="booking" className="py-24 bg-white relative overflow-hidden">
+        {/* Background blobs for premium feeling */}
+        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-gold-100 rounded-full blur-3xl opacity-30"></div>
+        <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-warm-200/50 rounded-full blur-3xl opacity-40"></div>
+
+        <div className="max-w-3xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-12">
+            <span className="text-gold-600 text-xs font-bold tracking-widest uppercase">Réservation</span>
+            <h2 className="text-3xl font-serif font-bold text-warm-800 mt-2">Réserver un moment</h2>
+            <div className="w-16 h-1 bg-gold-500 mx-auto mt-4 rounded-full"></div>
+          </div>
+
+          <div className="bg-warm-100/60 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-sm border border-warm-200">
             {bookingStatus === 'success' ? (
-              <div className="text-center py-8">
-                <div className="bg-[#F8F7F4] w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="text-[#8C7A6B]" size={40} />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-6"
+              >
+                <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                  <CheckCircle className="text-green-600" size={42} />
                 </div>
-                <h3 className="text-2xl font-serif font-bold text-[#4A4238] mb-2">Réservation Confirmée !</h3>
-                <p className="text-[#6B6358] mb-8">
-                  Merci pour votre confiance. Veuillez télécharger votre ticket à présenter le jour de votre rendez-vous.
+                <h3 className="text-3xl font-serif font-bold text-warm-800 mb-3">Réservation Confirmée !</h3>
+                <p className="text-warm-600 mb-8 max-w-md mx-auto text-sm leading-relaxed">
+                  Merci pour votre confiance. Veuillez télécharger et conserver votre ticket ci-dessous. Présentez-le à l'accueil le jour de votre rendez-vous.
                 </p>
                 
-                {/* Ticket to download */}
+                {/* Vintage Luxury Ticket to Download */}
                 <div className="flex justify-center mb-8">
                   <div 
                     ref={ticketRef} 
-                    className="bg-white border-2 border-[#8C7A6B] border-dashed rounded-2xl p-8 max-w-sm w-full text-left relative overflow-hidden"
+                    className="bg-white border border-warm-300 rounded-3xl p-8 max-w-sm w-full text-left relative overflow-hidden shadow-xl"
                   >
-                    <div className="absolute top-0 left-0 w-full h-2 bg-[#8C7A6B]"></div>
-                    <div className="text-center border-b border-[#E5E3DC] pb-4 mb-4">
-                      <div className="flex flex-col items-center justify-center mb-2">
-                        <span className="font-display text-2xl font-black tracking-tight text-[#2A2A2A] leading-none">FOUSS</span>
-                        <span className="font-sans text-[0.5rem] tracking-[0.3em] text-[#8C7A6B] uppercase font-medium mt-1">Coiffure</span>
+                    {/* Top Punch Hole Effect */}
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-gold-400 to-gold-600"></div>
+                    
+                    {/* Circle cutouts for ticket look */}
+                    <div className="absolute top-[120px] -left-3 w-6 h-6 bg-warm-100 rounded-full border-r border-warm-300"></div>
+                    <div className="absolute top-[120px] -right-3 w-6 h-6 bg-warm-100 rounded-full border-l border-warm-300"></div>
+
+                    {/* Logo Header */}
+                    <div className="text-center border-b border-dashed border-warm-300 pb-5 mb-5 mt-2">
+                      <div className="flex flex-col items-center justify-center">
+                        <span className="font-display text-2xl font-black tracking-tight text-warm-900 leading-none">FOUSS</span>
+                        <span className="font-sans text-[0.5rem] tracking-[0.3em] text-gold-600 uppercase font-bold mt-1">Coiffure</span>
                       </div>
-                      <p className="text-xs text-[#6B6358] uppercase tracking-widest mt-1">Ticket de Réservation</p>
+                      <p className="text-[10px] text-warm-500 uppercase tracking-widest mt-2 bg-warm-100 px-3 py-1 rounded-full inline-block">
+                        Ticket Officiel de Réservation
+                      </p>
                     </div>
                     
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-xs text-[#8C7A6B] uppercase">Nom & Prénom</p>
-                        <p className="font-medium text-[#4A4238]">{formData.lastName} {formData.firstName}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#8C7A6B] uppercase">Prestation</p>
-                        <p className="font-medium text-[#4A4238]">{formData.service}</p>
-                      </div>
-                      <div className="flex justify-between">
+                    {/* Ticket Details */}
+                    <div className="space-y-4 text-sm">
+                      <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <p className="text-xs text-[#8C7A6B] uppercase">Date</p>
-                          <p className="font-medium text-[#4A4238]">{formData.date}</p>
+                          <p className="text-[10px] text-warm-400 uppercase tracking-wider">Client</p>
+                          <p className="font-medium text-warm-800 truncate">{formData.firstName} {formData.lastName}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-xs text-[#8C7A6B] uppercase">Heure</p>
-                          <p className="font-medium text-[#4A4238]">{formData.time}</p>
+                        <div>
+                          <p className="text-[10px] text-warm-400 uppercase tracking-wider">Téléphone</p>
+                          <p className="font-medium text-warm-800">{formData.clientPhone}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-[10px] text-warm-400 uppercase tracking-wider">Prestation</p>
+                        <p className="font-medium text-warm-800">{formData.service}</p>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-warm-200/50">
+                        <div>
+                          <p className="text-[10px] text-warm-400 uppercase tracking-wider">Date</p>
+                          <p className="font-medium text-warm-800 text-xs">{formData.date}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-warm-400 uppercase tracking-wider">Heure</p>
+                          <p className="font-medium text-warm-800 text-xs">{formData.time}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-warm-400 uppercase tracking-wider">Espace</p>
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold inline-block ${
+                            formData.space === 'VIP' ? 'bg-gold-100 text-gold-800 border border-gold-300' : 'bg-warm-100 text-warm-700'
+                          }`}>
+                            {formData.space === 'VIP' ? 'SUITE VIP' : 'STANDARD'}
+                          </span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="mt-6 pt-4 border-t border-[#E5E3DC] text-center">
-                      <p className="text-xs text-[#6B6358] italic">À présenter lors de votre arrivée au salon.</p>
+                    {/* Divider & Barcode */}
+                    <div className="mt-6 pt-5 border-t border-dashed border-warm-300 text-center flex flex-col items-center">
+                      {/* Faux Barcode */}
+                      <div className="h-10 flex items-center justify-center gap-0.5 mb-2 w-full max-w-[200px]" aria-hidden="true">
+                        {[1, 2, 4, 1, 3, 2, 1, 4, 2, 1, 3, 1, 2, 4, 1, 2, 3, 1, 2].map((w, idx) => (
+                          <div 
+                            key={idx} 
+                            style={{ width: `${w}px` }} 
+                            className={`h-full ${idx % 3 === 0 ? 'bg-warm-300' : 'bg-warm-900'}`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-[9px] text-warm-400 font-mono tracking-widest">
+                        FOUSS-{formData.lastName.substring(0,3).toUpperCase()}-{Math.floor(1000 + Math.random() * 9000)}
+                      </p>
+                      <p className="text-[10px] text-warm-500 italic mt-3">À présenter le jour de votre visite.</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
                   <button 
                     onClick={downloadTicket}
-                    className="flex items-center justify-center gap-2 bg-[#4A4238] text-white px-8 py-3 rounded-full font-medium hover:bg-[#2A2A2A] transition-colors"
+                    className="flex items-center justify-center gap-2 bg-warm-900 text-white px-8 py-3.5 rounded-full font-medium hover:bg-black transition-all shadow-md active:scale-95 flex-1"
                   >
-                    <Download size={20} />
-                    Télécharger le ticket
+                    <Download size={18} />
+                    <span>Télécharger le ticket</span>
                   </button>
                   <button 
                     onClick={() => {
                       setBookingStatus('idle');
+                      setCurrentStep(1);
                       setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' });
                     }}
-                    className="bg-transparent border border-[#8C7A6B] text-[#8C7A6B] px-8 py-3 rounded-full font-medium hover:bg-[#F8F7F4] transition-colors"
+                    className="bg-transparent border border-warm-400 text-warm-700 px-8 py-3.5 rounded-full font-medium hover:bg-warm-200/50 transition-colors flex-1"
                   >
                     Nouveau rendez-vous
                   </button>
                 </div>
-              </div>
+              </motion.div>
             ) : (
-              <form onSubmit={handleBook} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-[#6B6358] mb-2">Nom</label>
-                    <input required type="text" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} className="w-full border border-[#E5E3DC] rounded-xl px-4 py-3 bg-[#F8F7F4]" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#6B6358] mb-2">Prénom</label>
-                    <input required type="text" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} className="w-full border border-[#E5E3DC] rounded-xl px-4 py-3 bg-[#F8F7F4]" />
-                  </div>
+              <form onSubmit={handleBook} className="space-y-8">
+                {/* Step Indicator */}
+                <div className="flex justify-between items-center max-w-md mx-auto mb-8 relative">
+                  <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-warm-200 -z-10"></div>
+                  <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gold-500 -z-10 transition-all duration-300" style={{ width: `${((currentStep - 1) / 2) * 100}%` }}></div>
+                  
+                  {[1, 2, 3].map((step) => (
+                    <div 
+                      key={step} 
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
+                        currentStep === step 
+                          ? 'bg-gold-500 text-white shadow-md scale-110 ring-4 ring-gold-100' 
+                          : currentStep > step 
+                          ? 'bg-gold-600 text-white' 
+                          : 'bg-white text-warm-400 border border-warm-200'
+                      }`}
+                    >
+                      {step}
+                    </div>
+                  ))}
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-[#6B6358] mb-2">Téléphone</label>
-                    <input required type="tel" value={formData.clientPhone} onChange={e => setFormData({...formData, clientPhone: e.target.value})} className="w-full border border-[#E5E3DC] rounded-xl px-4 py-3 bg-[#F8F7F4]" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#6B6358] mb-2">Prestation</label>
-                    <select required value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} className="w-full border border-[#E5E3DC] rounded-xl px-4 py-3 bg-[#F8F7F4]">
-                      <option value="">Choisir...</option>
-                      <option value="Tresses Africaines">Tresses Africaines</option>
-                      <option value="Coupe Dégradé">Coupe Dégradé</option>
-                      <option value="Soin Nappy">Soin Nappy</option>
-                    </select>
-                  </div>
+                {/* Step Content */}
+                <div className="min-h-[220px]">
+                  <AnimatePresence mode="wait">
+                    {currentStep === 1 && (
+                      <motion.div
+                        key="step1"
+                        initial={{ opacity: 0, x: 15 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -15 }}
+                        className="space-y-6"
+                      >
+                        <h4 className="text-lg font-serif font-semibold text-warm-800 text-center mb-4">Étape 1 : Choisissez votre prestation et l'espace</h4>
+                        
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-xs font-semibold text-warm-600 uppercase tracking-wider mb-2">Prestation souhaitée</label>
+                            <select 
+                              required 
+                              value={formData.service} 
+                              onChange={e => setFormData({...formData, service: e.target.value})} 
+                              className="w-full border border-warm-200 rounded-xl px-4 py-3.5 bg-white text-sm focus:outline-none focus:border-gold-500 shadow-sm transition-colors"
+                            >
+                              <option value="">Sélectionner un service...</option>
+                              {services.map(s => (
+                                <option key={s.id} value={s.name}>{s.name} ({s.price})</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold text-warm-600 uppercase tracking-wider mb-2">Espace de Coiffure</label>
+                            <div className="grid grid-cols-2 gap-3">
+                              <label className={`border rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-all ${
+                                formData.space === 'Standard' 
+                                  ? 'border-gold-500 bg-white ring-2 ring-gold-100 shadow-sm' 
+                                  : 'border-warm-200 bg-white/50 hover:bg-white'
+                              }`}>
+                                <input 
+                                  type="radio" 
+                                  name="space" 
+                                  value="Standard" 
+                                  checked={formData.space === 'Standard'} 
+                                  onChange={() => setFormData({...formData, space: 'Standard'})}
+                                  className="sr-only"
+                                />
+                                <span className="text-sm font-semibold text-warm-800">Standard</span>
+                                <span className="text-[10px] text-warm-400 mt-1">Cabine standard</span>
+                              </label>
+
+                              <label className={`border rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer transition-all ${
+                                formData.space === 'VIP' 
+                                  ? 'border-gold-500 bg-white ring-2 ring-gold-100 shadow-sm' 
+                                  : 'border-warm-200 bg-white/50 hover:bg-white'
+                              }`}>
+                                <input 
+                                  type="radio" 
+                                  name="space" 
+                                  value="VIP" 
+                                  checked={formData.space === 'VIP'} 
+                                  onChange={() => setFormData({...formData, space: 'VIP'})}
+                                  className="sr-only"
+                                />
+                                <span className="text-sm font-semibold text-gold-600 flex items-center gap-1">
+                                  Suite VIP <Sparkles size={10} className="text-gold-500" />
+                                </span>
+                                <span className="text-[10px] text-warm-500 mt-1">+5 000 FCFA</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+
+                        {formData.service && (
+                          <div className="bg-white p-4 rounded-xl border border-warm-200/60 shadow-inner text-xs">
+                            <span className="font-semibold text-warm-700">Détails de la prestation : </span>
+                            <span className="text-warm-600">{getSelectedServiceDetails()?.desc} </span>
+                            <div className="flex gap-4 mt-2 font-medium text-gold-600">
+                              <span>Durée: {getSelectedServiceDetails()?.duration}</span>
+                              <span>Tarif de base: {getSelectedServiceDetails()?.price}</span>
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {currentStep === 2 && (
+                      <motion.div
+                        key="step2"
+                        initial={{ opacity: 0, x: 15 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -15 }}
+                        className="space-y-6"
+                      >
+                        <h4 className="text-lg font-serif font-semibold text-warm-800 text-center mb-4">Étape 2 : Planifiez votre visite</h4>
+                        
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-xs font-semibold text-warm-600 uppercase tracking-wider mb-2">Date du rendez-vous</label>
+                            <input 
+                              required 
+                              type="date" 
+                              min={new Date().toISOString().split('T')[0]}
+                              value={formData.date} 
+                              onChange={e => setFormData({...formData, date: e.target.value})} 
+                              className="w-full border border-warm-200 rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-500 shadow-sm" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-warm-600 uppercase tracking-wider mb-2">Créneau horaire</label>
+                            <select 
+                              value={formData.time} 
+                              onChange={e => setFormData({...formData, time: e.target.value})} 
+                              className="w-full border border-warm-200 rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-500 shadow-sm"
+                            >
+                              <option>09:00</option>
+                              <option>10:00</option>
+                              <option>11:00</option>
+                              <option>12:00</option>
+                              <option>14:00</option>
+                              <option>15:00</option>
+                              <option>16:00</option>
+                              <option>17:00</option>
+                              <option>18:00</option>
+                              <option>19:00</option>
+                            </select>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {currentStep === 3 && (
+                      <motion.div
+                        key="step3"
+                        initial={{ opacity: 0, x: 15 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -15 }}
+                        className="space-y-6"
+                      >
+                        <h4 className="text-lg font-serif font-semibold text-warm-800 text-center mb-4">Étape 3 : Vos coordonnées</h4>
+                        
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-xs font-semibold text-warm-600 uppercase tracking-wider mb-2">Nom</label>
+                            <input 
+                              required 
+                              type="text" 
+                              placeholder="ex: Dupont"
+                              value={formData.lastName} 
+                              onChange={e => setFormData({...formData, lastName: e.target.value})} 
+                              className="w-full border border-warm-200 rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-500 shadow-sm" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-warm-600 uppercase tracking-wider mb-2">Prénom</label>
+                            <input 
+                              required 
+                              type="text" 
+                              placeholder="ex: Jean"
+                              value={formData.firstName} 
+                              onChange={e => setFormData({...formData, firstName: e.target.value})} 
+                              className="w-full border border-warm-200 rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-500 shadow-sm" 
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-warm-600 uppercase tracking-wider mb-2">Numéro de téléphone</label>
+                          <input 
+                            required 
+                            type="tel" 
+                            placeholder="ex: +229 97 00 00 00"
+                            value={formData.clientPhone} 
+                            onChange={e => setFormData({...formData, clientPhone: e.target.value})} 
+                            className="w-full border border-warm-200 rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-500 shadow-sm" 
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-[#6B6358] mb-2">Date</label>
-                    <input required type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full border border-[#E5E3DC] rounded-xl px-4 py-3 bg-[#F8F7F4]" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#6B6358] mb-2">Heure</label>
-                    <select value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full border border-[#E5E3DC] rounded-xl px-4 py-3 bg-[#F8F7F4]">
-                      <option>10:00</option>
-                      <option>14:00</option>
-                      <option>16:00</option>
-                    </select>
-                  </div>
-                </div>
+                {/* Form Buttons */}
+                <div className="flex justify-between items-center pt-6 border-t border-warm-200">
+                  {currentStep > 1 ? (
+                    <button 
+                      type="button" 
+                      onClick={prevStep}
+                      className="flex items-center gap-2 text-warm-600 hover:text-gold-600 transition-colors font-medium text-sm py-2 px-4"
+                    >
+                      <ArrowLeft size={16} />
+                      <span>Retour</span>
+                    </button>
+                  ) : (
+                    <div></div>
+                  )}
 
-                <button disabled={bookingStatus === 'loading'} type="submit" className="w-full bg-[#8C7A6B] text-white py-4 rounded-xl font-medium hover:bg-[#736356] transition-colors">
-                  {bookingStatus === 'loading' ? 'En cours...' : 'Confirmer la réservation'}
-                </button>
+                  {currentStep < 3 ? (
+                    <button 
+                      type="button" 
+                      onClick={nextStep}
+                      className="flex items-center gap-2 bg-warm-850 hover:bg-gold-600 text-white font-medium text-sm py-3 px-6 rounded-full shadow-md hover:shadow-lg transition-all"
+                    >
+                      <span>Suivant</span>
+                      <ArrowRight size={16} />
+                    </button>
+                  ) : (
+                    <button 
+                      type="submit" 
+                      disabled={bookingStatus === 'loading'}
+                      className="flex items-center gap-2 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-warm-900 font-bold text-sm py-3.5 px-8 rounded-full shadow-md hover:shadow-lg active:scale-95 transition-all"
+                    >
+                      {bookingStatus === 'loading' ? 'Réservation en cours...' : 'Confirmer la Réservation'}
+                    </button>
+                  )}
+                </div>
               </form>
             )}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[#2A2A2A] text-white py-12">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="flex flex-col items-center justify-center mb-6">
-            <span className="font-display text-3xl font-black tracking-tight text-white leading-none">FOUSS</span>
-            <span className="font-sans text-[0.6rem] tracking-[0.3em] text-[#8C7A6B] uppercase font-medium mt-1">Coiffure</span>
-          </div>
-          <p className="text-[#8C7A6B] mb-6">Le salon de référence à Cotonou.</p>
-          <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6 mb-8 text-sm">
-            <a href="https://wa.me/22957985073" target="_blank" rel="noopener noreferrer" className="hover:text-[#8C7A6B] transition-colors flex items-center">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" className="mr-2">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-              </svg>
-              WhatsApp: +229 57 98 50 73
-            </a>
-            <span className="hidden md:inline text-[#6B6358]">|</span>
-            <span className="text-[#E5E3DC]">Ouvert du Lundi au Samedi, 9h - 20h</span>
-          </div>
-          <p className="text-xs text-[#6B6358]">© {new Date().getFullYear()} Fouss Coiffure. Tous droits réservés.</p>
-        </div>
-      </footer>
-
-      {/* Floating WhatsApp Button */}
-      <a
-        href="https://wa.me/22957985073"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#128C7E] transition-all hover:scale-110 z-50 flex items-center justify-center group"
-        aria-label="Contactez-nous sur WhatsApp"
-      >
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-        </svg>
-      </a>
+      <Footer />
     </div>
   );
 }

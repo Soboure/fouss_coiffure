@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Users, User, Baby } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, User, Baby, X, Maximize2, Sparkles, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Link } from 'react-router-dom';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 const categories = [
   { id: 'femme', label: 'Femmes', icon: Users },
@@ -38,105 +40,158 @@ const galleryData = {
 
 export default function GalleryPage() {
   const [activeCategory, setActiveCategory] = useState<'femme' | 'homme' | 'enfant'>('femme');
+  const [selectedImg, setSelectedImg] = useState<string | null>(null);
+
+  // Close lightbox on escape keypress
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedImg(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] text-[#2A2A2A] font-sans">
-      {/* Header */}
-      <header className="bg-white border-b border-[#E5E3DC] sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center text-[#8C7A6B] hover:text-[#736356] transition-colors">
-            <ArrowLeft size={20} className="mr-2" />
-            <span className="text-sm font-medium">Retour</span>
-          </Link>
-          <div className="flex flex-col items-center">
-            <span className="font-display text-2xl font-black tracking-tight text-[#2A2A2A] leading-none">FOUSS</span>
-            <span className="font-sans text-[0.5rem] tracking-[0.3em] text-[#8C7A6B] uppercase font-medium mt-1">Galerie</span>
+    <div className="min-h-screen bg-warm-100 text-warm-900 font-sans flex flex-col justify-between">
+      <div>
+        <Navbar />
+
+        {/* Header Section */}
+        <section className="relative py-24 bg-warm-900 text-white overflow-hidden mt-[73px]">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] z-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-warm-900 via-warm-900/80 to-transparent z-0"></div>
+          
+          <div className="max-w-7xl mx-auto px-6 relative z-10 text-center md:text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="text-gold-400 text-xs font-bold tracking-widest uppercase">Galerie Photo</span>
+              <h1 className="text-4xl md:text-5xl font-serif font-bold mt-2">Nos Réalisations</h1>
+              <p className="text-warm-400 text-sm md:text-base mt-4 max-w-xl leading-relaxed">
+                Explorez nos plus belles créations. Des tresses élaborées aux dégradés masculins impeccables, 
+                chaque coiffure est une œuvre unique réalisée avec passion.
+              </p>
+            </motion.div>
           </div>
-          <div className="w-20"></div> {/* Spacer for centering */}
-        </div>
-      </header>
+        </section>
 
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-serif font-bold text-[#4A4238] mb-4">Notre Galerie</h1>
-          <p className="text-[#6B6358] max-w-2xl mx-auto">
-            Explorez nos plus belles réalisations. Chaque coiffure est une œuvre d'art unique, 
-            conçue pour sublimer votre beauté naturelle.
-          </p>
-        </div>
+        {/* Gallery Content */}
+        <main className="max-w-7xl mx-auto px-6 py-16">
+          {/* Category Selector */}
+          <div className="flex justify-center mb-12">
+            <div className="bg-white p-1.5 rounded-full shadow-sm border border-warm-200 flex space-x-1">
+              {categories.map((cat) => {
+                const Icon = cat.icon;
+                const isSelected = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id as any)}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs md:text-sm font-semibold tracking-wide transition-all relative ${
+                      isSelected
+                        ? 'bg-warm-850 text-white shadow-md'
+                        : 'text-warm-600 hover:text-warm-900 hover:bg-warm-100'
+                    }`}
+                  >
+                    <Icon size={14} />
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-        {/* Category Selector */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-white p-1 rounded-full shadow-sm border border-[#E5E3DC] flex">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id as any)}
-                  className={`flex items-center px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    activeCategory === cat.id
-                      ? 'bg-[#8C7A6B] text-white shadow-md'
-                      : 'text-[#6B6358] hover:bg-[#F8F7F4]'
-                  }`}
+          {/* Gallery Grid */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {galleryData[activeCategory].map((img, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => setSelectedImg(img)}
+                  className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-warm-200 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                 >
-                  <Icon size={16} className="mr-2" />
-                  {cat.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                  <img
+                    src={img}
+                    alt={`${activeCategory} style`}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  {/* Hover Overlay with Icon */}
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="bg-white/20 backdrop-blur-md p-4 rounded-full border border-white/30 text-white scale-75 group-hover:scale-100 transition-transform duration-300 shadow-lg">
+                      <Maximize2 size={20} />
+                    </div>
+                  </div>
 
-        {/* Gallery Grid */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {galleryData[activeCategory].map((img, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-[#E5E3DC]"
-              >
-                <img
-                  src={img}
-                  alt={`${activeCategory} coiffure ${index + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                  <div className="bg-white/90 backdrop-blur-sm w-full py-3 px-4 rounded-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                    <p className="text-xs font-bold text-[#4A4238] uppercase tracking-widest text-center">
-                      {activeCategory === 'femme' ? 'Style Féminin' : activeCategory === 'homme' ? 'Style Masculin' : 'Style Enfant'}
+                  {/* Caption badge */}
+                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm py-2.5 px-4 rounded-2xl border border-warm-200/50 shadow-sm opacity-90 group-hover:opacity-100 transition-opacity">
+                    <p className="text-[10px] font-bold text-warm-800 uppercase tracking-widest text-center flex items-center justify-center gap-1.5">
+                      <Sparkles size={10} className="text-gold-500" />
+                      <span>
+                        {activeCategory === 'femme' ? 'Création Féminine' : activeCategory === 'homme' ? 'Création Masculine' : 'Style Enfant'}
+                      </span>
                     </p>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-[#E5E3DC] py-12 mt-12">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-[#8C7A6B] text-sm mb-4">Vous aimez ce que vous voyez ?</p>
-          <Link
-            to="/#booking"
-            className="inline-block bg-[#8C7A6B] text-white px-8 py-3 rounded-full font-medium hover:bg-[#736356] transition-colors shadow-lg"
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {selectedImg && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm"
+            onClick={() => setSelectedImg(null)}
           >
-            Prendre rendez-vous
-          </Link>
-        </div>
-      </footer>
+            {/* Close button */}
+            <button
+              onClick={() => setSelectedImg(null)}
+              className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full border border-white/10 transition-colors z-50"
+              aria-label="Fermer"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Image display container */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative max-w-4xl max-h-[85vh] overflow-hidden rounded-3xl border border-white/10 shadow-2xl flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
+            >
+              <img
+                src={selectedImg}
+                alt="Coiffure grand format"
+                className="max-w-full max-h-[85vh] object-contain"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Footer />
     </div>
   );
 }
