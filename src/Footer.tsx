@@ -20,7 +20,7 @@ export default function Footer() {
                 </span>
               </div>
               <p className="text-creme/70 text-xs md:text-sm max-w-xs leading-relaxed font-light">
-                Maison de Beauté et concept showroom exclusif à Cotonou. Découvrez le bien-être capillaire et corporel ultime.
+                Maison de Beauté et concept showroom exclusif. Découvrez le bien-être capillaire et corporel ultime.
               </p>
             </div>
 
@@ -31,7 +31,7 @@ export default function Footer() {
                 <span>Horaires d'Ouverture</span>
               </h4>
               <p className="text-creme/80 text-sm leading-loose">
-                Lundi - Samedi : 09h00 - 20h00
+                Lundi - Samedi : 09h00 - 23h00
               </p>
               <p className="text-creme/50 text-xs mt-2 italic">
                 Dimanche : Fermé (Uniquement sur événement VIP)

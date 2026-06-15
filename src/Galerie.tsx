@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, X, Maximize2, Scissors, Heart, ShoppingBag, Eye } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { Sparkles, X, Scissors, Heart, ShoppingBag, Eye } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion'; 
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+
+type CategoryType = 'coiffure' | 'soins' | 'mode';
 
 const categories = [
   { id: 'coiffure', label: 'Haute Coiffure', icon: Scissors },
@@ -13,22 +15,22 @@ const categories = [
 
 const galleryData = {
   soins: [
-    { src: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800', title: 'Massage aux Pierres Chaudes', desc: 'Massage corporel décontractant pour libérer le stress.' },
-    { src: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=800', title: 'Soin Visage Hydratant', desc: 'Purification cutanée et masque hydratant régénérant.' },
-    { src: '/galerie/expert3.jpg', title: 'Rituel Capillaire & Huiles', desc: 'Soin profond du cuir chevelu par nos esthéticiennes.' },
-    { src: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=800', title: 'Aromathérapie Capillaire', desc: 'Application d\'huiles précieuses bio pour la fibre.' },
-    { src: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800', title: 'Espace Détente & Bain', desc: 'Atmosphère calme pour vos rituels spa.' }
+    { src: '/galerie/Soins1.jpg', title: 'Massage aux Pierres Chaudes', desc: 'Massage corporel décontractant pour libérer le stress.' },
+    { src: '/galerie/Soins2.jpg', title: 'Soin Visage Hydratant', desc: 'Purification cutanée et masque hydratant régénérant.' },
+    { src: '/galerie/Soins3.jpg', title: 'Rituel Capillaire & Huiles', desc: 'Soin profond du cuir chevelu par nos esthéticiennes.' },
+    { src: '/galerie/Soins4.jpg', title: 'Aromathérapie Capillaire', desc: 'Application d\'huiles précieuses bio pour la fibre.' },
+    { src: '/galerie/Soins5.jpg', title: 'Espace Détente & Bain', desc: 'Atmosphère calme pour vos rituels spa.' }
   ],
   mode: [
-    { src: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800', title: 'Le Showroom Concept', desc: 'Notre espace d\'exposition prêt-à-porter à la Haie Vive.' },
-    { src: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800', title: 'Robes de Créateurs', desc: 'Pièces uniques sélectionnées pour vos événements.' },
-    { src: 'https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=800', title: 'Accessoires de Mode', desc: 'Maroquinerie fine et bijoux d\'artisans créateurs.' },
-    { src: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=800', title: 'Prêt-à-Porter Masculin', desc: 'Ensembles en lin et tenues élégantes de créateurs.' }
+    { src: '/galerie/Showroom1.jpg', title: 'Le Showroom Concept', desc: 'Notre espace d\'exposition prêt-à-porter à la Haie Vive.' },
+    { src: '/galerie/Showroom2.jpg', title: 'Robes de Créateurs', desc: 'Pièces uniques sélectionnées pour vos événements.' },
+    { src: '/galerie/Showroom3.jpg', title: 'Accessoires de Mode', desc: 'Maroquinerie fine et bijoux d\'artisans créateurs.' },
+    { src: '/galerie/Showroom4.jpg', title: 'Prêt-à-Porter Masculin', desc: 'Ensembles en lin et tenues élégantes de créateurs.' }
   ]
 };
 
 export default function Galerie() {
-  const [activeCategory, setActiveCategory] = useState<'coiffure' | 'soins' | 'mode'>('coiffure');
+  const [activeCategory, setActiveCategory] = useState<CategoryType>('coiffure');
   const [selectedImg, setSelectedImg] = useState<{ src: string, title: string, desc: string } | null>(null);
 
   useEffect(() => {
@@ -74,7 +76,7 @@ export default function Galerie() {
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => setActiveCategory(cat.id as any)}
+                    onClick={() => setActiveCategory(cat.id as CategoryType)}
                     className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs md:text-sm font-semibold tracking-wide transition-all ${
                       isSelected
                         ? 'bg-charcoal text-white shadow-md'
@@ -174,6 +176,7 @@ export default function Galerie() {
                   </div>
                 </>
               ) : (
+                // 🔥 CORRECTION : Utilisation d'une assertion sécurisée 
                 galleryData[activeCategory as 'soins' | 'mode'].map((item, index) => (
                   <motion.div
                     key={index}

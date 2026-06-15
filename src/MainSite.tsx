@@ -184,7 +184,7 @@ export default function MainSite() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-lg md:text-xl text-creme/90 mb-10 max-w-2xl font-light"
           >
-            Coiffure d'exception, soins spa bien-être et showroom de prêt-à-porter haut de gamme. Un espace complet dédié à votre style et votre sérénité.
+            Coiffure d'exception, soins spa bien-être et  prêt-à-porter haut de gamme. Un espace complet dédié à votre style et votre sérénité.
           </motion.p>
 
           <motion.div
@@ -209,7 +209,7 @@ export default function MainSite() {
             <span className="text-gold-dark text-xs font-bold tracking-widest uppercase">Notre Concept</span>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-charcoal mt-2">Maison Fouss</h2>
             <p className="text-warm-brown mt-3 max-w-lg mx-auto text-sm leading-relaxed">
-              Un lieu unique à Cotonou réunissant le meilleur du soin corporel, de l'art capillaire et de la mode vestimentaire.
+              Des lieux unique au Bénin réunissant le meilleur du soin corporel, de l'art capillaire et de la mode vestimentaire.
             </p>
             <div className="w-16 h-0.5 bg-gold-dark mx-auto mt-5"></div>
           </div>
