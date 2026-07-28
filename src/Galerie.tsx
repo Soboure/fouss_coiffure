@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, X, Scissors, Heart, ShoppingBag, Eye } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion'; 
+import { motion, AnimatePresence } from 'motion/react'; 
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -15,17 +15,14 @@ const categories = [
 
 const galleryData = {
   soins: [
-    { src: '/galerie/Soins1.jpg', title: 'Massage aux Pierres Chaudes', desc: 'Massage corporel décontractant pour libérer le stress.' },
-    { src: '/galerie/Soins2.jpg', title: 'Soin Visage Hydratant', desc: 'Purification cutanée et masque hydratant régénérant.' },
-    { src: '/galerie/Soins3.jpg', title: 'Rituel Capillaire & Huiles', desc: 'Soin profond du cuir chevelu par nos esthéticiennes.' },
-    { src: '/galerie/Soins4.jpg', title: 'Aromathérapie Capillaire', desc: 'Application d\'huiles précieuses bio pour la fibre.' },
-    { src: '/galerie/Soins5.jpg', title: 'Espace Détente & Bain', desc: 'Atmosphère calme pour vos rituels spa.' }
+    { src: '/galerie/Soin1.jpg', title: 'Massage aux Pierres Chaudes', desc: 'Massage corporel décontractant pour libérer le stress.' },
+    { src: '/galerie/Soin2.jpg', title: 'Soin Visage Hydratant', desc: 'Purification cutanée et masque hydratant régénérant.' },
+    { src: '/galerie/Soin3.jpg', title: 'Rituel Capillaire & Huiles', desc: 'Soin profond du cuir chevelu par nos esthéticiennes.' },
+    { src: '/galerie/Soin4.jpg', title: 'Aromathérapie Capillaire', desc: 'Application d\'huiles précieuses bio pour la fibre.' }
   ],
   mode: [
     { src: '/galerie/Showroom1.jpg', title: 'Le Showroom Concept', desc: 'Notre espace d\'exposition prêt-à-porter à la Haie Vive.' },
-    { src: '/galerie/Showroom2.jpg', title: 'Robes de Créateurs', desc: 'Pièces uniques sélectionnées pour vos événements.' },
-    { src: '/galerie/Showroom3.jpg', title: 'Accessoires de Mode', desc: 'Maroquinerie fine et bijoux d\'artisans créateurs.' },
-    { src: '/galerie/Showroom4.jpg', title: 'Prêt-à-Porter Masculin', desc: 'Ensembles en lin et tenues élégantes de créateurs.' }
+    { src: '/galerie/Showroom2.jpg', title: 'Robes de Créateurs', desc: 'Pièces uniques sélectionnées pour vos événements.' }
   ]
 };
 

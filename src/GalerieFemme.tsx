@@ -9,9 +9,7 @@ const photos = [
   { src: '/galerie/femme1.jpg', title: 'Tresses Artistiques', desc: 'Tresses complexes et structurées réalisées à la main par Aïcha.' },
   { src: '/galerie/femme2.jpg', title: 'Coiffure de Cérémonie', desc: 'Chignon et coiffure habillée pour événements.' },
   { src: '/galerie/femme3.jpg', title: 'Soin Protecteur & Nappy', desc: 'Hydratation profonde et nattes protectrices sur cheveux naturels.' },
-  { src: '/galerie/femme4.jpg', title: 'Tresses & Nattes Collées', desc: 'Nattes protectrices plaquées au style moderne.' },
-  { src: '/galerie/femme5.jpg', title: 'Box Braids Premium', desc: 'Tresses individuelles légères et durables.' },
-  { src: '/galerie/femme6.jpg', title: 'Tissage Naturel Haut de Gamme', desc: 'Pose de mèches russes avec fermeture invisible.' }
+  { src: '/galerie/femme4.jpg', title: 'Tresses & Nattes Collées', desc: 'Nattes protectrices plaquées au style moderne.' }
 ];
 
 export default function GalerieFemme() {

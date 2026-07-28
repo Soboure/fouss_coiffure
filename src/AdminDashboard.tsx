@@ -3,49 +3,87 @@ import { Link } from 'react-router-dom';
 import { Lock, LogOut, Calendar, Clock, Search, ShieldAlert, Sparkles, CheckCircle } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('fouss_admin_token'));
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [reservations, setReservations] = useState<any[]>([]);
   const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const isAuthenticated = !!token;
+
   useEffect(() => {
-    if (isAuthenticated) {
+    if (token) {
       fetchReservations();
     }
-  }, [isAuthenticated]);
+  }, [token]);
 
   const fetchReservations = () => {
-    fetch('/api/reservations')
-      .then(res => res.json())
-      .then(data => setReservations(data))
+    if (!token) return;
+    fetch('/api/reservations', {
+      headers: {
+        'X-Admin-Token': token
+      }
+    })
+      .then(res => {
+        if (res.status === 401) {
+          handleLogout();
+          throw new Error('Session expirée');
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setReservations(data);
+        }
+      })
       .catch(err => console.error("Error fetching reservations:", err));
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'fouss2024') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Mot de passe incorrect');
+    setError('');
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        localStorage.setItem('fouss_admin_token', data.token);
+        setToken(data.token);
+      } else {
+        setError(data.error || 'Mot de passe incorrect');
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError('Erreur de connexion avec le serveur');
     }
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    localStorage.removeItem('fouss_admin_token');
+    setToken(null);
     setPassword('');
     setReservations([]);
   };
 
   const updateStatus = async (id: number, status: string) => {
+    if (!token) return;
     try {
       const res = await fetch(`/api/reservations/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Admin-Token': token
+        },
         body: JSON.stringify({ status })
       });
+      if (res.status === 401) {
+        handleLogout();
+        return;
+      }
       if (res.ok) {
         setReservations(reservations.map(r => r.id === id ? { ...r, status } : r));
       }

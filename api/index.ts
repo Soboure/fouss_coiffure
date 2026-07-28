@@ -1,8 +1,33 @@
 import express from 'express';
 import { sql } from '@vercel/postgres';
+import crypto from 'crypto';
 
 const app = express();
 app.use(express.json());
+
+// In-memory active admin sessions
+const sessions = new Set<string>();
+
+// Login route for administrator
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  const expectedPassword = process.env.ADMIN_PASSWORD || 'fouss2024';
+  if (password === expectedPassword) {
+    const token = crypto.randomUUID();
+    sessions.add(token);
+    return res.json({ success: true, token });
+  }
+  return res.status(401).json({ error: 'Mot de passe incorrect' });
+});
+
+// Admin authentication middleware
+const adminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const token = req.headers['x-admin-token'];
+  if (!token || !sessions.has(token as string)) {
+    return res.status(401).json({ error: 'Non autorisé' });
+  }
+  next();
+};
 
 const usePostgres = !!process.env.POSTGRES_URL;
 console.log("Database mode detected:", usePostgres ? "Postgres" : "SQLite");
@@ -59,7 +84,7 @@ const initDb = async () => {
   }
 };
 
-app.get('/api/reservations', async (req, res) => {
+app.get('/api/reservations', adminAuth, async (req, res) => {
   try {
     await initDb();
     if (usePostgres) {
@@ -107,7 +132,7 @@ app.post('/api/reservations', async (req, res) => {
   }
 });
 
-app.patch('/api/reservations/:id', async (req, res) => {
+app.patch('/api/reservations/:id', adminAuth, async (req, res) => {
   try {
     const { status } = req.body;
     if (usePostgres) {

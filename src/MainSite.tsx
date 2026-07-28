@@ -6,29 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-// --- DATA ---
-const serviceCategories = {
-  coiffure: [
-    { id: 'tresses', name: 'Tresses Africaines', price: '15 000 FCFA', duration: '2h - 4h', desc: 'Tresses artistiques traditionnelles ou modernes.' },
-    { id: 'tissage', name: 'Tissage & Perruque', price: '20 000 FCFA', duration: '2h', desc: 'Pose professionnelle et confection sur-mesure.' },
-    { id: 'nappy', name: 'Soin Profond Nappy', price: '10 000 FCFA', duration: '1h', desc: 'Soin hydratant intense pour cheveux naturels.' },
-    { id: 'degrade', name: 'Coupe Dégradé Homme', price: '3 000 FCFA', duration: '30 min', desc: 'Coupe moderne avec finitions au rasoir.' }
-  ],
-  soins: [
-    { id: 'massage', name: 'Massage Relaxant aux Huiles', price: '25 000 FCFA', duration: '1h', desc: 'Massage corporel décontractant aux huiles essentielles.' },
-    { id: 'visage', name: 'Soin Visage Éclat Purifiant', price: '15 000 FCFA', duration: '45 min', desc: 'Nettoyage en profondeur et masque hydratant.' },
-    { id: 'rituel', name: 'Rituel Beauté Complète', price: '45 000 FCFA', duration: '3h', desc: 'Coiffure + Soin visage + Massage (Suite VIP incluse).' }
-  ],
-  boutique: [
-    { id: 'shopping', name: 'Session Shopping Privée', price: 'Gratuit', duration: '1h', desc: 'Accès exclusif à notre showroom de prêt-à-porter avec styliste dédié.' }
-  ]
-};
-
-const allServicesList = [
-  ...serviceCategories.coiffure,
-  ...serviceCategories.soins,
-  ...serviceCategories.boutique
-];
+import { serviceCategories, allServicesList } from './data/services';
 
 const pillars = [
   {
