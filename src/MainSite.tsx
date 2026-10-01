@@ -258,389 +258,115 @@ export default function MainSite() {
       </section>
 
       {/* Booking Section */}
-      <section id="booking" className="py-24 bg-white relative overflow-hidden">
-        {/* Background shapes */}
-        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-creme rounded-full blur-3xl opacity-40"></div>
-        <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-sable/20 rounded-full blur-3xl opacity-50"></div>
-
-        <div className="max-w-3xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-12">
-            <span className="text-gold-dark text-xs font-bold tracking-widest uppercase">Réservation en Ligne</span>
-            <h2 className="text-3xl font-serif font-bold text-charcoal mt-2">Réserver votre instant</h2>
-            <div className="w-16 h-0.5 bg-gold-dark mx-auto mt-4"></div>
+      <section id="booking" className="py-20 bg-creme">
+        <div className="max-w-2xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-serif font-bold text-charcoal">Prendre rendez-vous</h2>
+            <p className="text-warm-brown text-sm mt-3 leading-relaxed">
+              Trois étapes. Le salon reçoit la demande et la confirme. Le dimanche, le salon n'ouvre que pour un événement VIP.
+            </p>
           </div>
 
-          <div className="bg-creme/70 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-sable shadow-sm">
+          <div className="bg-white p-6 md:p-8 rounded-3xl border border-sable">
             {bookingStatus === 'success' ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-6"
-              >
-                <div className="bg-green-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-200">
-                  <CheckCircle className="text-green-600" size={42} />
+              <div className="text-center py-4">
+                <CheckCircle className="text-green-600 mx-auto" size={40} />
+                <h3 className="text-2xl font-serif font-bold mt-4">Demande envoyée</h3>
+                <p className="text-warm-brown text-sm mt-2">Gardez le ticket. Le salon peut encore confirmer le créneau.</p>
+                <div ref={ticketRef} className="bg-creme border border-sable rounded-2xl p-5 mt-6 text-left text-sm">
+                  <p className="font-bold">FOUSS · Ticket</p>
+                  <p className="mt-3">{formData.firstName} {formData.lastName}</p>
+                  <p>{formData.clientPhone}</p>
+                  <p className="mt-2">{formData.service}</p>
+                  <p>{formData.date} à {formData.time}</p>
+                  <p>{formData.space === 'VIP' ? 'Suite VIP' : 'Standard'}</p>
                 </div>
-                <h3 className="text-3xl font-serif font-bold text-charcoal mb-3">Réservation Enregistrée !</h3>
-                <p className="text-warm-brown mb-8 max-w-md mx-auto text-sm leading-relaxed">
-                  Votre demande a bien été envoyée. Veuillez télécharger votre ticket ci-dessous et le conserver pour votre visite.
-                </p>
-                
-                {/* Printable Ticket - High Contrast for Printing */}
-                <div className="flex justify-center mb-8">
-                  <div 
-                    ref={ticketRef} 
-                    className="bg-white border-2 border-charcoal border-dashed rounded-3xl p-8 max-w-sm w-full text-left relative overflow-hidden shadow-lg"
-                  >
-                    {/* Punch holes */}
-                    <div className="absolute top-[120px] -left-3.5 w-7 h-7 bg-creme rounded-full border-r-2 border-charcoal"></div>
-                    <div className="absolute top-[120px] -right-3.5 w-7 h-7 bg-creme rounded-full border-l-2 border-charcoal"></div>
-
-                    {/* Logo Header */}
-                    <div className="text-center border-b-2 border-dashed border-charcoal/30 pb-5 mb-5">
-                      <div className="flex flex-col items-center justify-center">
-                        <span className="font-display text-2xl font-black tracking-tight text-charcoal leading-none">FOUSS</span>
-                        <span className="font-sans text-[0.5rem] tracking-[0.3em] text-gold-dark uppercase font-bold mt-1">Maison de Beauté</span>
-                      </div>
-                      <p className="text-[10px] text-taupe uppercase tracking-widest mt-2 font-bold">
-                        TICKET DE RÉSERVATION
-                      </p>
-                    </div>
-                    
-                    {/* Details */}
-                    <div className="space-y-4 text-xs text-charcoal">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <p className="text-[10px] text-taupe uppercase tracking-wider font-semibold">Client</p>
-                          <p className="font-bold truncate">{formData.firstName} {formData.lastName}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-taupe uppercase tracking-wider font-semibold">Contact</p>
-                          <p className="font-bold">{formData.clientPhone}</p>
-                        </div>
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] text-taupe uppercase tracking-wider font-semibold">Prestation</p>
-                        <p className="font-bold">{formData.service}</p>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-sable">
-                        <div>
-                          <p className="text-[10px] text-taupe uppercase tracking-wider font-semibold">Date</p>
-                          <p className="font-bold">{formData.date}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-taupe uppercase tracking-wider font-semibold">Heure</p>
-                          <p className="font-bold">{formData.time}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-taupe uppercase tracking-wider font-semibold">Espace</p>
-                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold inline-block border ${
-                            formData.space === 'VIP' ? 'bg-gold-dark/10 text-gold-dark border-gold-dark/20' : 'bg-creme text-charcoal border-sable'
-                          }`}>
-                            {formData.space === 'VIP' ? 'SUITE VIP' : 'STANDARD'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Barcode */}
-                    <div className="mt-6 pt-5 border-t-2 border-dashed border-charcoal/30 text-center flex flex-col items-center">
-                      <div className="h-10 flex items-center justify-center gap-0.5 mb-2 w-full max-w-[200px]" aria-hidden="true">
-                        {[1, 3, 2, 1, 4, 1, 3, 2, 1, 2, 3, 1, 4, 2, 1, 2, 3, 1, 2].map((w, idx) => (
-                          <div 
-                            key={idx} 
-                            style={{ width: `${w}px` }} 
-                            className={`h-full ${idx % 3 === 0 ? 'bg-charcoal/20' : 'bg-charcoal'}`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-[9px] text-taupe font-mono tracking-widest font-semibold">
-                        FOUSS-{formData.lastName.substring(0,3).toUpperCase()}-{Math.floor(1000 + Math.random() * 9000)}
-                      </p>
-                    </div>
-                  </div>
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                  <button type="button" onClick={downloadTicket} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">Télécharger le ticket</button>
+                  <button type="button" onClick={() => { setBookingStatus('idle'); setCurrentStep(1); setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' }); }} className="flex-1 border border-sable py-3 rounded-full text-xs font-semibold">Nouvelle demande</button>
                 </div>
-
-                <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
-                  <button 
-                    onClick={downloadTicket}
-                    className="flex items-center justify-center gap-2 bg-bordeaux hover:bg-[#6E120E] text-white px-8 py-3.5 rounded-full font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 flex-1"
-                  >
-                    <Download size={16} />
-                    <span>Télécharger</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setBookingStatus('idle');
-                      setCurrentStep(1);
-                      setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' });
-                    }}
-                    className="bg-transparent border border-sable text-warm-brown px-8 py-3.5 rounded-full font-semibold text-xs uppercase tracking-wider hover:bg-creme transition-colors flex-1"
-                  >
-                    Nouveau RDV
-                  </button>
-                </div>
-              </motion.div>
+              </div>
             ) : (
-              <form onSubmit={handleBook} className="space-y-8 text-charcoal">
-                {/* Step Indicator */}
-                <div className="flex justify-between items-center max-w-sm mx-auto mb-8 relative">
-                  <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-sable -z-10"></div>
-                  <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gold-dark -z-10 transition-all duration-300" style={{ width: `${((currentStep - 1) / 2) * 100}%` }}></div>
-                  
-                  {[1, 2, 3].map((step) => (
-                    <div 
-                      key={step} 
-                      className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                        currentStep === step 
-                          ? 'bg-gold-dark text-white shadow-md scale-110 ring-4 ring-gold-dark/10' 
-                          : currentStep > step 
-                          ? 'bg-charcoal text-white' 
-                          : 'bg-white text-taupe border border-sable'
-                      }`}
-                    >
-                      {step}
-                    </div>
+              <form onSubmit={handleBook} className="space-y-6">
+                <div className="grid grid-cols-3 gap-2 text-center text-xs font-semibold">
+                  {['1. Prestation', '2. Date', '3. Coordonnées'].map((label, index) => (
+                    <div key={label} className={`py-2 rounded-full ${currentStep === index + 1 ? 'bg-bordeaux text-white' : 'bg-creme text-taupe'}`}>{label}</div>
                   ))}
                 </div>
 
-                {/* Step Content */}
-                <div className="min-h-[240px]">
-                  <AnimatePresence mode="wait">
-                    {currentStep === 1 && (
-                      <motion.div
-                        key="step1"
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="space-y-6"
-                      >
-                        <h4 className="text-base font-semibold text-charcoal text-center mb-4 font-serif">Étape 1 : Prestation & Espace</h4>
-                        
-                        {/* Category Select tabs */}
-                        <div className="flex justify-center border-b border-sable pb-3 gap-6 text-xs font-semibold">
-                          <button 
-                            type="button"
-                            onClick={() => { setSelectedCat('coiffure'); setFormData({...formData, service: ''}); }}
-                            className={`pb-1.5 transition-colors relative ${selectedCat === 'coiffure' ? 'text-gold-dark border-b-2 border-gold-dark' : 'text-taupe hover:text-charcoal'}`}
-                          >
-                            Haute Coiffure
-                          </button>
-                          <button 
-                            type="button"
-                            onClick={() => { setSelectedCat('soins'); setFormData({...formData, service: ''}); }}
-                            className={`pb-1.5 transition-colors relative ${selectedCat === 'soins' ? 'text-gold-dark border-b-2 border-gold-dark' : 'text-taupe hover:text-charcoal'}`}
-                          >
-                            Spa & Soins
-                          </button>
-                          <button 
-                            type="button"
-                            onClick={() => { setSelectedCat('boutique'); setFormData({...formData, service: ''}); }}
-                            className={`pb-1.5 transition-colors relative ${selectedCat === 'boutique' ? 'text-gold-dark border-b-2 border-gold-dark' : 'text-taupe hover:text-charcoal'}`}
-                          >
-                            Showroom Concept
-                          </button>
-                        </div>
+                {currentStep > 1 && (
+                  <p className="text-xs text-warm-brown bg-creme rounded-xl px-3 py-2">
+                    {formData.service || 'Prestation non choisie'} · {formData.space === 'VIP' ? 'Suite VIP' : 'Standard'}
+                    {formData.date ? ` · ${formData.date} à ${formData.time}` : ''}
+                  </p>
+                )}
 
-                        <div className="grid md:grid-cols-2 gap-6 pt-2">
-                          <div>
-                            <label className="block text-xs font-bold text-warm-brown uppercase tracking-wider mb-2">Prestation</label>
-                            <select 
-                              required 
-                              value={formData.service} 
-                              onChange={e => setFormData({...formData, service: e.target.value})} 
-                              className="w-full border border-sable rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-dark shadow-inner text-charcoal font-medium"
-                            >
-                              <option value="">Sélectionner...</option>
-                              {serviceCategories[selectedCat].map(s => (
-                                <option key={s.id} value={s.name}>{s.name} ({s.price})</option>
-                              ))}
-                            </select>
-                          </div>
+                {currentStep === 1 && (
+                  <div className="space-y-4">
+                    <p className="text-sm font-semibold">Que souhaitez-vous ?</p>
+                    <div className="flex gap-2 text-xs font-semibold">
+                      {([['coiffure', 'Coiffure'], ['soins', 'Soins'], ['boutique', 'Showroom']] as const).map(([id, label]) => (
+                        <button key={id} type="button" onClick={() => { setSelectedCat(id); setFormData({ ...formData, service: '' }); }} className={`px-3 py-2 rounded-full ${selectedCat === id ? 'bg-charcoal text-white' : 'bg-creme'}`}>{label}</button>
+                      ))}
+                    </div>
+                    <label className="block text-xs font-bold uppercase text-warm-brown">Prestation</label>
+                    <select required value={formData.service} onChange={e => setFormData({ ...formData, service: e.target.value })} className="w-full border border-sable rounded-xl px-4 py-3 bg-white text-sm">
+                      <option value="">Choisir une prestation</option>
+                      {serviceCategories[selectedCat].map(s => (
+                        <option key={s.id} value={s.name}>{s.name} — {s.price}</option>
+                      ))}
+                    </select>
+                    {formData.service && <p className="text-xs text-warm-brown">{getSelectedServiceDetails()?.desc} · {getSelectedServiceDetails()?.duration}</p>}
+                    <p className="text-sm font-semibold pt-2">Où ?</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button type="button" onClick={() => setFormData({ ...formData, space: 'Standard' })} className={`border rounded-2xl p-3 text-left ${formData.space === 'Standard' ? 'border-bordeaux bg-creme' : 'border-sable'}`}>
+                        <span className="block text-sm font-bold">Standard</span>
+                        <span className="block text-xs text-taupe mt-1">Cabine classique, prix affiché</span>
+                      </button>
+                      <button type="button" onClick={() => setFormData({ ...formData, space: 'VIP' })} className={`border rounded-2xl p-3 text-left ${formData.space === 'VIP' ? 'border-bordeaux bg-creme' : 'border-sable'}`}>
+                        <span className="block text-sm font-bold text-bordeaux">Suite VIP</span>
+                        <span className="block text-xs text-taupe mt-1">Cabine privée, +5 000 FCFA</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
 
-                          <div>
-                            <label className="block text-xs font-bold text-warm-brown uppercase tracking-wider mb-2">Espace de Beauté</label>
-                            <div className="grid grid-cols-2 gap-3">
-                              <label className={`border rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${
-                                formData.space === 'Standard' 
-                                  ? 'border-gold-dark bg-white ring-2 ring-gold-dark/10 shadow-sm' 
-                                  : 'border-sable bg-white/60 hover:bg-white'
-                              }`}>
-                                <input 
-                                  type="radio" 
-                                  name="space" 
-                                  value="Standard" 
-                                  checked={formData.space === 'Standard'} 
-                                  onChange={() => setFormData({...formData, space: 'Standard'})}
-                                  className="sr-only"
-                                />
-                                <span className="text-xs font-bold text-charcoal">Standard</span>
-                                <span className="text-[9px] text-taupe mt-0.5">Cabine classique</span>
-                              </label>
+                {currentStep === 2 && (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-warm-brown mb-2">Jour</label>
+                      <input required type="date" min={new Date().toISOString().split('T')[0]} value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} className="w-full border border-sable rounded-xl px-4 py-3 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-warm-brown mb-2">Heure</label>
+                      <select value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} className="w-full border border-sable rounded-xl px-4 py-3 text-sm">
+                        {['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'].map(h => <option key={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <p className="sm:col-span-2 text-xs text-taupe">Le salon est ouvert de 09h à 23h, du lundi au samedi. 13h n'est pas proposé.</p>
+                  </div>
+                )}
 
-                              <label className={`border rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${
-                                formData.space === 'VIP' 
-                                  ? 'border-gold-dark bg-white ring-2 ring-gold-dark/10 shadow-sm' 
-                                  : 'border-sable bg-white/60 hover:bg-white'
-                              }`}>
-                                <input 
-                                  type="radio" 
-                                  name="space" 
-                                  value="VIP" 
-                                  checked={formData.space === 'VIP'} 
-                                  onChange={() => setFormData({...formData, space: 'VIP'})}
-                                  className="sr-only"
-                                />
-                                <span className="text-xs font-bold text-gold-dark flex items-center gap-0.5">
-                                  Suite VIP <Sparkles size={10} />
-                                </span>
-                                <span className="text-[9px] text-gold-dark mt-0.5 font-medium">+5 000 FCFA</span>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
+                {currentStep === 3 && (
+                  <div className="space-y-4">
+                    <p className="text-sm font-semibold">Pour vous rappeler</p>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <input required type="text" placeholder="Prénom" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} className="border border-sable rounded-xl px-4 py-3 text-sm" />
+                      <input required type="text" placeholder="Nom" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} className="border border-sable rounded-xl px-4 py-3 text-sm" />
+                    </div>
+                    <input required type="tel" placeholder="Téléphone, exemple 57 98 50 73" value={formData.clientPhone} onChange={e => setFormData({ ...formData, clientPhone: e.target.value })} className="w-full border border-sable rounded-xl px-4 py-3 text-sm" />
+                  </div>
+                )}
 
-                        {formData.service && (
-                          <div className="bg-white p-4 rounded-xl border border-sable/60 text-xs">
-                            <span className="font-bold text-charcoal">Description : </span>
-                            <span className="text-warm-brown">{getSelectedServiceDetails()?.desc} </span>
-                            <div className="flex gap-4 mt-2.5 font-semibold text-gold-dark">
-                              <span>Durée : {getSelectedServiceDetails()?.duration}</span>
-                              <span>Prix : {getSelectedServiceDetails()?.price}</span>
-                            </div>
-                          </div>
-                        )}
-                      </motion.div>
-                    )}
-
-                    {currentStep === 2 && (
-                      <motion.div
-                        key="step2"
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="space-y-6"
-                      >
-                        <h4 className="text-base font-semibold text-charcoal text-center mb-4 font-serif">Étape 2 : Date & Créneau</h4>
-                        
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-xs font-bold text-warm-brown uppercase tracking-wider mb-2">Choisir une Date</label>
-                            <input 
-                              required 
-                              type="date" 
-                              min={new Date().toISOString().split('T')[0]}
-                              value={formData.date} 
-                              onChange={e => setFormData({...formData, date: e.target.value})} 
-                              className="w-full border border-sable rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-dark shadow-inner text-charcoal font-medium" 
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-warm-brown uppercase tracking-wider mb-2">Choisir l'Heure</label>
-                            <select 
-                              value={formData.time} 
-                              onChange={e => setFormData({...formData, time: e.target.value})} 
-                              className="w-full border border-sable rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-dark shadow-inner text-charcoal font-medium"
-                            >
-                              <option>09:00</option>
-                              <option>10:00</option>
-                              <option>11:00</option>
-                              <option>12:00</option>
-                              <option>14:00</option>
-                              <option>15:00</option>
-                              <option>16:00</option>
-                              <option>17:00</option>
-                              <option>18:00</option>
-                              <option>19:00</option>
-                            </select>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {currentStep === 3 && (
-                      <motion.div
-                        key="step3"
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="space-y-6"
-                      >
-                        <h4 className="text-base font-semibold text-charcoal text-center mb-4 font-serif">Étape 3 : Informations Personnelles</h4>
-                        
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-xs font-bold text-warm-brown uppercase tracking-wider mb-2">Nom</label>
-                            <input 
-                              required 
-                              type="text" 
-                              placeholder="Dupont"
-                              value={formData.lastName} 
-                              onChange={e => setFormData({...formData, lastName: e.target.value})} 
-                              className="w-full border border-sable rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-dark shadow-inner text-charcoal font-medium" 
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-warm-brown uppercase tracking-wider mb-2">Prénom</label>
-                            <input 
-                              required 
-                              type="text" 
-                              placeholder="Jean"
-                              value={formData.firstName} 
-                              onChange={e => setFormData({...formData, firstName: e.target.value})} 
-                              className="w-full border border-sable rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-dark shadow-inner text-charcoal font-medium" 
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-bold text-warm-brown uppercase tracking-wider mb-2">Numéro de Téléphone</label>
-                          <input 
-                            required 
-                            type="tel" 
-                            placeholder="+229 97 00 00 00"
-                            value={formData.clientPhone} 
-                            onChange={e => setFormData({...formData, clientPhone: e.target.value})} 
-                            className="w-full border border-sable rounded-xl px-4 py-3 bg-white text-sm focus:outline-none focus:border-gold-dark shadow-inner text-charcoal font-medium" 
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Navigation Buttons */}
-                <div className="flex justify-between items-center pt-6 border-t border-sable">
+                <div className="flex justify-between items-center pt-2">
                   {currentStep > 1 ? (
-                    <button 
-                      type="button" 
-                      onClick={prevStep}
-                      className="flex items-center gap-1.5 text-warm-brown hover:text-gold-dark transition-colors font-semibold text-xs uppercase tracking-wider py-2 px-3"
-                    >
-                      <ArrowLeft size={14} />
-                      <span>Retour</span>
-                    </button>
-                  ) : (
-                    <div></div>
-                  )}
-
+                    <button type="button" onClick={prevStep} className="text-xs font-semibold uppercase text-warm-brown">Retour</button>
+                  ) : <span />}
                   {currentStep < 3 ? (
-                    <button 
-                      type="button" 
-                      onClick={nextStep}
-                      className="flex items-center gap-1.5 bg-bordeaux hover:bg-[#6E120E] text-white font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-full shadow-sm transition-all"
-                    >
-                      <span>Suivant</span>
-                      <ArrowRight size={14} />
-                    </button>
+                    <button type="button" onClick={nextStep} className="bg-bordeaux text-white text-xs font-bold uppercase px-6 py-3 rounded-full">Suivant</button>
                   ) : (
-                    <button 
-                      type="submit" 
-                      disabled={bookingStatus === 'loading'}
-                      className="flex items-center gap-1.5 bg-gold-dark hover:bg-charcoal text-white font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-full shadow-md transition-all active:scale-95"
-                    >
-                      {bookingStatus === 'loading' ? 'Envoi...' : 'Confirmer le Rendez-vous'}
+                    <button type="submit" disabled={bookingStatus === 'loading'} className="bg-bordeaux text-white text-xs font-bold uppercase px-6 py-3 rounded-full">
+                      {bookingStatus === 'loading' ? 'Envoi...' : 'Envoyer ma demande'}
                     </button>
                   )}
                 </div>

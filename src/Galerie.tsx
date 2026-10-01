@@ -113,21 +113,12 @@ export default function Galerie() {
           </div>
         )}
 
-        {grande && (
-          <button onClick={() => setOuverte(0)} className="relative block w-full md:w-1/2 aspect-[3/4] rounded-3xl overflow-hidden mb-6 text-left">
-            <img src={grande.src} alt={grande.title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 to-transparent" />
-            <div className="absolute bottom-5 left-5 text-white">
-              <p className="text-2xl font-serif font-bold">{grande.title}</p>
-              <p className="text-sm text-white/80">{photos.length} photos</p>
-            </div>
-          </button>
-        )}
-
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {suite.map((photo, index) => (
-            <button key={photo.src} onClick={() => setOuverte(index + 1)} className="aspect-[3/4] rounded-2xl overflow-hidden">
-              <img src={photo.src} alt={photo.title} className="w-full h-full object-cover" />
+        <p className="text-sm text-taupe mb-4">{photos.length} photos</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {photos.map((photo, index) => (
+            <button key={photo.src} onClick={() => setOuverte(index)} className="text-left">
+              <img src={photo.src} alt={photo.title} className="w-full h-40 md:h-48 object-cover rounded-2xl bg-white" />
+              <p className="text-xs font-semibold mt-2">{photo.title}</p>
             </button>
           ))}
         </div>
