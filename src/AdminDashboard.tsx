@@ -71,15 +71,6 @@ export default function AdminDashboard() {
     if (res.ok) setReservations(reservations.map(r => r.id === id ? { ...r, status } : r));
   };
 
-  const supprimer = async (id: number) => {
-    if (!token || !window.confirm('Supprimer cette réservation ?')) return;
-    const res = await fetch(`/api/reservations/${id}`, {
-      method: 'DELETE',
-      headers: { 'X-Admin-Token': token }
-    });
-    if (res.ok) setReservations(reservations.filter(r => r.id !== id));
-  };
-
   const confirmed = reservations.filter(r => r.status === 'Confirmé').length;
   const pending = reservations.filter(r => r.status !== 'Confirmé').length;
   const visibles = reservations.filter(res => {
@@ -174,7 +165,6 @@ export default function AdminDashboard() {
                     <button onClick={() => updateStatus(res.id, res.status === 'Confirmé' ? 'En attente' : 'Confirmé')} className="block ml-auto text-xs font-bold bg-bordeaux text-white px-3 py-2 rounded-full">
                       {res.status === 'Confirmé' ? 'Remettre en attente' : 'Confirmer'}
                     </button>
-                    <button onClick={() => supprimer(res.id)} className="block ml-auto text-xs text-red-700">Supprimer</button>
                   </td>
                 </tr>
               ))}
