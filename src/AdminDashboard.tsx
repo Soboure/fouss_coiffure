@@ -115,21 +115,21 @@ export default function AdminDashboard() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#1C1B19] flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="min-h-screen bg-[#241C18] flex items-center justify-center p-6 relative overflow-hidden">
         {/* Decorative background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#C9A84C]/10 rounded-full blur-[80px] pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#8C1913]/10 rounded-full blur-[80px] pointer-events-none"></div>
         
-        <div className="bg-[#2C2B28] p-8 md:p-10 rounded-3xl border border-white/5 max-w-md w-full relative z-10 shadow-2xl">
+        <div className="bg-[#2B211C] p-8 md:p-10 rounded-3xl border border-white/5 max-w-md w-full relative z-10 shadow-2xl">
           <div className="flex justify-center mb-6">
-            <div className="bg-[#1C1B19] p-4 rounded-full border border-white/5 shadow-inner">
-              <Lock className="text-[#C9A84C]" size={32} />
+            <div className="bg-[#241C18] p-4 rounded-full border border-white/5 shadow-inner">
+              <Lock className="text-[#8C1913]" size={32} />
             </div>
           </div>
           
           <div className="text-center mb-8">
             <div className="flex flex-col items-center justify-center mb-2">
               <span className="font-display text-2xl font-black tracking-tight text-white leading-none">FOUSS</span>
-              <span className="font-sans text-[0.5rem] tracking-[0.3em] text-[#C9A84C] uppercase font-semibold mt-1">Maison de Beauté</span>
+              <span className="font-sans text-[0.5rem] tracking-[0.3em] text-[#8C1913] uppercase font-semibold mt-1">Maison de Beauté</span>
             </div>
             <h1 className="text-xl font-serif font-bold text-white mt-4">Accès Administrateur</h1>
             <p className="text-white/60 text-xs mt-1">Saisissez votre mot de passe pour gérer les rendez-vous.</p>
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Mot de passe"
                 required
-                className="w-full border border-white/10 rounded-xl px-4 py-3.5 bg-[#1C1B19] text-white placeholder-white/30 focus:outline-none focus:border-[#C9A84C] text-sm transition-colors"
+                className="w-full border border-white/10 rounded-xl px-4 py-3.5 bg-[#241C18] text-white placeholder-white/30 focus:outline-none focus:border-[#8C1913] text-sm transition-colors"
               />
               {error && (
                 <p className="text-red-400 text-xs mt-2 flex items-center gap-1.5 font-semibold">
@@ -154,14 +154,14 @@ export default function AdminDashboard() {
             </div>
             <button 
               type="submit" 
-              className="w-full bg-[#C9A84C] hover:bg-[#7A5F1A] text-[#2C2B28] hover:text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95"
+              className="w-full bg-[#8C1913] hover:bg-[#6E120E] text-[#2B211C] hover:text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95"
             >
               Se connecter
             </button>
           </form>
           
           <div className="mt-6 text-center">
-            <Link to="/" className="text-xs text-white/50 hover:text-[#C9A84C] hover:underline transition-colors">
+            <Link to="/" className="text-xs text-white/50 hover:text-[#8C1913] hover:underline transition-colors">
               Retour au site public
             </Link>
           </div>
@@ -171,15 +171,15 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1C1B19] text-white font-sans p-6 md:p-10">
+    <div className="min-h-screen bg-[#241C18] text-white font-sans p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 pb-6 border-b border-white/5">
           <div>
             <div className="flex items-center gap-2">
               <span className="font-display text-2xl font-black tracking-tight text-white leading-none">FOUSS</span>
-              <span className="font-sans text-[0.5rem] tracking-[0.3em] text-[#C9A84C] uppercase font-semibold mt-1">Admin</span>
-              <span className="bg-[#C9A84C]/10 text-[#C9A84C] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#C9A84C]/25 ml-2 uppercase">
+              <span className="font-sans text-[0.5rem] tracking-[0.3em] text-[#8C1913] uppercase font-semibold mt-1">Admin</span>
+              <span className="bg-[#8C1913]/10 text-[#8C1913] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#8C1913]/25 ml-2 uppercase">
                 Panel Actif
               </span>
             </div>
@@ -189,7 +189,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-3">
             <Link 
               to="/" 
-              className="text-xs font-semibold text-white/80 hover:text-white px-4 py-2.5 bg-[#2C2B28] hover:bg-[#383632] rounded-xl border border-white/5 transition-colors"
+              className="text-xs font-semibold text-white/80 hover:text-white px-4 py-2.5 bg-[#2B211C] hover:bg-[#383632] rounded-xl border border-white/5 transition-colors"
             >
               Voir le site
             </Link>
@@ -205,17 +205,17 @@ export default function AdminDashboard() {
 
         {/* Stats Cards */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-          <div className="bg-[#2C2B28] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
+          <div className="bg-[#2B211C] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
             <div>
               <p className="text-xs text-white/60 uppercase tracking-wider font-semibold">Total Demandes</p>
               <h3 className="text-3xl font-bold mt-2 font-serif text-white">{totalBookings}</h3>
             </div>
-            <div className="bg-[#1C1B19] p-3.5 rounded-2xl border border-white/5 text-white/70">
+            <div className="bg-[#241C18] p-3.5 rounded-2xl border border-white/5 text-white/70">
               <Calendar size={20} />
             </div>
           </div>
 
-          <div className="bg-[#2C2B28] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
+          <div className="bg-[#2B211C] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
             <div>
               <p className="text-xs text-white/60 uppercase tracking-wider font-semibold">Confirmées</p>
               <h3 className="text-3xl font-bold mt-2 font-serif text-green-400">{confirmedBookings}</h3>
@@ -225,19 +225,19 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-[#2C2B28] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
+          <div className="bg-[#2B211C] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
             <div>
               <p className="text-xs text-white/60 uppercase tracking-wider font-semibold">En attente</p>
-              <h3 className="text-3xl font-bold mt-2 font-serif text-[#C9A84C]">{pendingBookings}</h3>
+              <h3 className="text-3xl font-bold mt-2 font-serif text-[#8C1913]">{pendingBookings}</h3>
             </div>
-            <div className="bg-[#C9A84C]/10 p-3.5 rounded-2xl border border-[#C9A84C]/20 text-[#C9A84C] animate-pulse">
+            <div className="bg-[#8C1913]/10 p-3.5 rounded-2xl border border-[#8C1913]/20 text-[#8C1913] animate-pulse">
               <Clock size={20} />
             </div>
           </div>
         </section>
 
         {/* Filters bar */}
-        <section className="flex flex-col md:flex-row gap-4 justify-between items-center mb-8 bg-[#2C2B28] p-4 rounded-2xl border border-white/5 shadow-md">
+        <section className="flex flex-col md:flex-row gap-4 justify-between items-center mb-8 bg-[#2B211C] p-4 rounded-2xl border border-white/5 shadow-md">
           {/* Search bar */}
           <div className="relative w-full md:max-w-xs">
             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-white/40 pointer-events-none">
@@ -248,16 +248,16 @@ export default function AdminDashboard() {
               placeholder="Rechercher client, téléphone..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#1C1B19] border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#C9A84C] text-white placeholder-white/30"
+              className="w-full pl-10 pr-4 py-2.5 bg-[#241C18] border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#8C1913] text-white placeholder-white/30"
             />
           </div>
 
           {/* Status Tabs */}
-          <div className="flex bg-[#1C1B19] p-1 rounded-xl border border-white/10 w-full md:w-auto shrink-0 overflow-x-auto">
+          <div className="flex bg-[#241C18] p-1 rounded-xl border border-white/10 w-full md:w-auto shrink-0 overflow-x-auto">
             <button 
               onClick={() => setFilter('all')}
               className={`flex-1 md:flex-none px-5 py-2 text-xs font-semibold rounded-lg transition-all ${
-                filter === 'all' ? 'bg-[#C9A84C] text-[#2C2B28] font-bold' : 'text-white/60 hover:text-white'
+                filter === 'all' ? 'bg-[#8C1913] text-white font-bold' : 'text-white/60 hover:text-white'
               }`}
             >
               Tous ({totalBookings})
@@ -265,7 +265,7 @@ export default function AdminDashboard() {
             <button 
               onClick={() => setFilter('pending')}
               className={`flex-1 md:flex-none px-5 py-2 text-xs font-semibold rounded-lg transition-all ${
-                filter === 'pending' ? 'bg-[#C9A84C] text-[#2C2B28] font-bold' : 'text-white/60 hover:text-white'
+                filter === 'pending' ? 'bg-[#8C1913] text-white font-bold' : 'text-white/60 hover:text-white'
               }`}
             >
               En attente ({pendingBookings})
@@ -273,7 +273,7 @@ export default function AdminDashboard() {
             <button 
               onClick={() => setFilter('confirmed')}
               className={`flex-1 md:flex-none px-5 py-2 text-xs font-semibold rounded-lg transition-all ${
-                filter === 'confirmed' ? 'bg-[#C9A84C] text-[#2C2B28] font-bold' : 'text-white/60 hover:text-white'
+                filter === 'confirmed' ? 'bg-[#8C1913] text-white font-bold' : 'text-white/60 hover:text-white'
               }`}
             >
               Confirmés ({confirmedBookings})
@@ -282,11 +282,11 @@ export default function AdminDashboard() {
         </section>
 
         {/* Data Table */}
-        <div className="bg-[#2C2B28] rounded-3xl shadow-xl border border-white/5 overflow-hidden">
+        <div className="bg-[#2B211C] rounded-3xl shadow-xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#1C1B19] border-b border-white/5">
+                <tr className="bg-[#241C18] border-b border-white/5">
                   <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50">Client / Contact</th>
                   <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50">Prestation</th>
                   <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50">Date & Heure</th>
@@ -301,7 +301,7 @@ export default function AdminDashboard() {
                     {/* Client Name & Phone */}
                     <td className="p-5">
                       <div className="flex items-center gap-3">
-                        <div className="bg-[#1C1B19] w-9 h-9 rounded-full flex items-center justify-center border border-white/10 text-[#C9A84C] font-bold text-xs uppercase shadow-inner">
+                        <div className="bg-[#241C18] w-9 h-9 rounded-full flex items-center justify-center border border-white/10 text-[#8C1913] font-bold text-xs uppercase shadow-inner">
                           {res.clientName ? res.clientName.substring(0,2) : 'CL'}
                         </div>
                         <div>
@@ -321,7 +321,7 @@ export default function AdminDashboard() {
                       <div className="flex flex-col gap-0.5">
                         <span className="font-medium">{res.date}</span>
                         <span className="text-xs text-white/40 flex items-center gap-1">
-                          <Clock size={12} className="text-[#C9A84C]" />
+                          <Clock size={12} className="text-[#8C1913]" />
                           {res.time}
                         </span>
                       </div>
@@ -331,8 +331,8 @@ export default function AdminDashboard() {
                     <td className="p-5">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                         res.space === 'VIP' 
-                          ? 'bg-[#C9A84C]/10 text-[#C9A84C] border-[#C9A84C]/20' 
-                          : 'bg-[#1C1B19] text-white/50 border-white/5'
+                          ? 'bg-[#8C1913]/10 text-[#8C1913] border-[#8C1913]/20' 
+                          : 'bg-[#241C18] text-white/50 border-white/5'
                       }`}>
                         {res.space === 'VIP' ? 'SUITE VIP' : 'Standard'}
                       </span>
@@ -346,8 +346,8 @@ export default function AdminDashboard() {
                           Confirmé
                         </span>
                       ) : (
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#C9A84C]/10 text-[#C9A84C] border border-[#C9A84C]/20 inline-flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C]"></span>
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#8C1913]/10 text-[#8C1913] border border-[#8C1913]/20 inline-flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#8C1913]"></span>
                           En attente
                         </span>
                       )}
@@ -358,14 +358,14 @@ export default function AdminDashboard() {
                       {res.status !== 'Confirmé' ? (
                         <button 
                           onClick={() => updateStatus(res.id, 'Confirmé')} 
-                          className="text-xs font-bold text-[#2C2B28] bg-[#C9A84C] hover:bg-[#7A5F1A] hover:text-white px-4 py-2 rounded-xl transition-all shadow-md active:scale-95"
+                          className="text-xs font-bold text-white bg-[#8C1913] hover:bg-[#6E120E] hover:text-white px-4 py-2 rounded-xl transition-all shadow-md active:scale-95"
                         >
                           Confirmer
                         </button>
                       ) : (
                         <button 
                           onClick={() => updateStatus(res.id, 'En attente')} 
-                          className="text-xs font-semibold text-white/60 hover:text-white px-4 py-2 hover:bg-[#1C1B19] rounded-xl transition-all"
+                          className="text-xs font-semibold text-white/60 hover:text-white px-4 py-2 hover:bg-[#241C18] rounded-xl transition-all"
                         >
                           Remettre en attente
                         </button>

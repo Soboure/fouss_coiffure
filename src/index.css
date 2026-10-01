@@ -7,14 +7,15 @@
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   
   /* Accessible Color Palette */
-  --color-gold-light: #C9A84C;  /* Only for dark backgrounds */
-  --color-gold-dark: #7A5F1A;   /* For text/links on light backgrounds */
+  --color-gold-light: #E7C8C6;  /* Accent lisible sur fond sombre, famille bordeaux */
+  --color-gold-dark: #8C1913;   /* Bordeaux, liens et prix sur fond clair */
   
-  --color-charcoal: #2C2B28;    /* Main dark text / backgrounds */
-  --color-warm-brown: #5A5140;  /* Secondary text / body alternative */
-  --color-taupe: #7A6E5E;       /* Labels, metadata, subtle text */
-  --color-sable: #E8E0D0;       /* Borders and dividers */
-  --color-creme: #F8F7F4;       /* Main light background */
+  --color-charcoal: #2B211C;    /* Texte, comme l'application */
+  --color-bordeaux: #8C1913;   /* Boutons, comme l'application */
+  --color-warm-brown: #5C463F;  /* Texte secondaire */
+  --color-taupe: #7A655E;       /* Labels */
+  --color-sable: #E7DDD6;       /* Bordure des cartes, comme l'application */
+  --color-creme: #F7F3EF;       /* Fond crème, comme l'application */
 }
 
 body {
@@ -46,13 +47,13 @@ html {
 
 /* Gold Gradient text and effects */
 .gold-gradient-text {
-  background: linear-gradient(135deg, #C9A84C 0%, #7A5F1A 100%);
+  background: linear-gradient(135deg, #8C1913 0%, #6E120E 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gold-gradient-bg {
-  background: linear-gradient(135deg, #C9A84C 0%, #7A5F1A 100%);
+  background: linear-gradient(135deg, #8C1913 0%, #6E120E 100%);
 }
 
 .gold-glow {

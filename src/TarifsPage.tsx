@@ -146,7 +146,7 @@ export default function TarifsPage() {
 
             <Link
               to="/#booking"
-              className="bg-gold-light text-charcoal hover:bg-white px-8 py-4 rounded-full text-xs font-bold tracking-widest uppercase hover:scale-105 transition-all inline-flex items-center gap-2"
+              className="bg-bordeaux text-white hover:bg-white px-8 py-4 rounded-full text-xs font-bold tracking-widest uppercase hover:scale-105 transition-all inline-flex items-center gap-2"
             >
               <Calendar size={14} />
               <span>Réserver mon Instant VIP</span>

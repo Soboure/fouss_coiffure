@@ -117,7 +117,7 @@ export default function Galerie() {
                       <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Nattes artistiques, tresses collées, perruques et soins profonds nappy.</p>
                       <Link 
                         to="/galerie/femmes" 
-                        className="inline-flex items-center justify-center bg-gold-light text-charcoal py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
+                        className="inline-flex items-center justify-center bg-bordeaux text-white py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
                       >
                         Découvrir la Galerie
                       </Link>
@@ -141,7 +141,7 @@ export default function Galerie() {
                       <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Dégradés américains, tailles de barbe à l'ancienne et rituels visagistes.</p>
                       <Link 
                         to="/galerie/hommes" 
-                        className="inline-flex items-center justify-center bg-gold-light text-charcoal py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
+                        className="inline-flex items-center justify-center bg-bordeaux text-white py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
                       >
                         Découvrir la Galerie
                       </Link>
@@ -165,7 +165,7 @@ export default function Galerie() {
                       <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Coupes garçons rapides et tresses douces protectrices pour fillettes.</p>
                       <Link 
                         to="/galerie/enfants" 
-                        className="inline-flex items-center justify-center bg-gold-light text-charcoal py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
+                        className="inline-flex items-center justify-center bg-bordeaux text-white py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
                       >
                         Découvrir la Galerie
                       </Link>

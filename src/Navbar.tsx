@@ -57,7 +57,7 @@ export default function Navbar() {
           ))}
           <Link
             to="/#booking"
-            className="flex items-center gap-2 bg-charcoal hover:bg-gold-dark text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+            className="flex items-center gap-2 bg-bordeaux hover:bg-[#6E120E] text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
           >
             <Calendar size={14} />
             <span>Réserver</span>
@@ -96,7 +96,7 @@ export default function Navbar() {
           <Link
             to="/#booking"
             onClick={handleLinkClick}
-            className="flex items-center justify-center gap-2 bg-charcoal hover:bg-gold-dark text-white py-3.5 rounded-2xl text-base font-semibold transition-all duration-300 shadow-md"
+            className="flex items-center justify-center gap-2 bg-bordeaux hover:bg-[#6E120E] text-white py-3.5 rounded-2xl text-base font-semibold transition-all duration-300 shadow-md"
           >
             <Calendar size={18} />
             <span>Prendre RDV</span>

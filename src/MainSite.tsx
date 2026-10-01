@@ -172,7 +172,7 @@ export default function MainSite() {
           >
             <a 
               href="#booking"
-              className="bg-gold-light text-charcoal px-10 py-5 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-white hover:scale-105 active:scale-95 transform transition-all duration-300 shadow-xl"
+              className="bg-bordeaux text-white px-10 py-5 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-white hover:scale-105 active:scale-95 transform transition-all duration-300 shadow-xl"
             >
               Prendre un Rendez-vous
             </a>
@@ -375,7 +375,7 @@ export default function MainSite() {
                 <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
                   <button 
                     onClick={downloadTicket}
-                    className="flex items-center justify-center gap-2 bg-charcoal hover:bg-gold-dark text-white px-8 py-3.5 rounded-full font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 flex-1"
+                    className="flex items-center justify-center gap-2 bg-bordeaux hover:bg-[#6E120E] text-white px-8 py-3.5 rounded-full font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 flex-1"
                   >
                     <Download size={16} />
                     <span>Télécharger</span>
@@ -639,7 +639,7 @@ export default function MainSite() {
                     <button 
                       type="button" 
                       onClick={nextStep}
-                      className="flex items-center gap-1.5 bg-charcoal hover:bg-gold-dark text-white font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-full shadow-sm transition-all"
+                      className="flex items-center gap-1.5 bg-bordeaux hover:bg-[#6E120E] text-white font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-full shadow-sm transition-all"
                     >
                       <span>Suivant</span>
                       <ArrowRight size={14} />
