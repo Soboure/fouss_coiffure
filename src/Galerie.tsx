@@ -1,252 +1,162 @@
-import React, { useState, useEffect } from 'react';
-import { Sparkles, X, Scissors, Heart, ShoppingBag, Eye } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react'; 
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-type CategoryType = 'coiffure' | 'soins' | 'mode';
+type Famille = 'coiffure' | 'soins' | 'style';
+type PublicCoiffure = 'enfant' | 'homme' | 'femme';
 
-const categories = [
-  { id: 'coiffure', label: 'Haute Coiffure', icon: Scissors },
-  { id: 'soins', label: 'Spa & Esthétique', icon: Heart },
-  { id: 'mode', label: 'Showroom Mode', icon: ShoppingBag },
+const familles = [
+  { id: 'coiffure', label: 'Coiffure' },
+  { id: 'soins', label: 'Soins' },
+  { id: 'style', label: 'Style' },
+] as const;
+
+const photosEnfant = [
+  { src: '/galerie/enfant1.jpg', title: 'Tresses Fillette Créatives' },
+  { src: '/galerie/enfant2.jpg', title: 'Coupe Petit Gentleman' },
+  { src: '/galerie/enfant3.jpg', title: 'Tresses Protectrices Enfant' },
+  { src: '/galerie/enfant4.jpg', title: 'Coupe Garçon Moderne' },
+  { src: '/galerie/enfant5.jpg', title: 'Nattes Fillette Simples' },
+  { src: '/galerie/enfant6.jpg', title: 'Soin Démêlant sans Douleur' },
 ];
 
-const galleryData = {
-  soins: [
-    { src: '/galerie/Soin1.jpg', title: 'Massage aux Pierres Chaudes', desc: 'Massage corporel décontractant pour libérer le stress.' },
-    { src: '/galerie/Soin2.jpg', title: 'Soin Visage Hydratant', desc: 'Purification cutanée et masque hydratant régénérant.' },
-    { src: '/galerie/Soin3.jpg', title: 'Rituel Capillaire & Huiles', desc: 'Soin profond du cuir chevelu par nos esthéticiennes.' },
-    { src: '/galerie/Soin4.jpg', title: 'Aromathérapie Capillaire', desc: 'Application d\'huiles précieuses bio pour la fibre.' }
-  ],
-  mode: [
-    { src: '/galerie/Showroom1.jpg', title: 'Le Showroom Concept', desc: 'Notre espace d\'exposition prêt-à-porter à la Haie Vive.' },
-    { src: '/galerie/Showroom2.jpg', title: 'Robes de Créateurs', desc: 'Pièces uniques sélectionnées pour vos événements.' }
-  ]
-};
+const photosHomme = [
+  { src: '/galerie/homme1.jpg', title: 'Dégradé Vagues' },
+  { src: '/galerie/homme2.jpg', title: 'Forfait Barbe & Coupe' },
+  { src: '/galerie/homme3.jpg', title: 'Dégradé à Blanc' },
+  { src: '/galerie/homme4.jpg', title: 'Contours Dessinés' },
+  { src: '/galerie/homme5.jpg', title: 'Taille de Barbe Traditionnelle' },
+  { src: '/galerie/homme6.jpg', title: 'Afro Court Dégradé' },
+  { src: '/galerie/homme7.jpg', title: 'Contours & Coloration Barbe' },
+  { src: '/galerie/homme8.jpg', title: 'Coupe Slick Back Dégradé' },
+  { src: '/galerie/homme9.jpg', title: 'Prestation Master Barbier' },
+];
+
+const photosFemme = [
+  { src: '/galerie/femme1.jpg', title: 'Tresses Artistiques' },
+  { src: '/galerie/femme2.jpg', title: 'Coiffure de Cérémonie' },
+  { src: '/galerie/femme3.jpg', title: 'Soin Protecteur & Nappy' },
+  { src: '/galerie/femme4.jpg', title: 'Tresses & Nattes Collées' },
+];
+
+const photosSoins = [
+  { src: '/galerie/Soin1.jpg', title: 'Massage aux Pierres Chaudes' },
+  { src: '/galerie/Soin2.jpg', title: 'Soin Visage Hydratant' },
+  { src: '/galerie/Soin3.jpg', title: 'Rituel Capillaire & Huiles' },
+  { src: '/galerie/Soin4.jpg', title: 'Aromathérapie Capillaire' },
+];
+
+const photosStyle = [
+  { src: '/galerie/Showroom1.jpg', title: 'Le Showroom' },
+  { src: '/galerie/Showroom2.jpg', title: 'Robes de Créateurs' },
+];
 
 export default function Galerie() {
-  const [activeCategory, setActiveCategory] = useState<CategoryType>('coiffure');
-  const [selectedImg, setSelectedImg] = useState<{ src: string, title: string, desc: string } | null>(null);
+  const [famille, setFamille] = useState<Famille>('coiffure');
+  const [publicCoiffure, setPublicCoiffure] = useState<PublicCoiffure>('enfant');
+  const [ouverte, setOuverte] = useState<number | null>(null);
+
+  const photos = famille === 'soins'
+    ? photosSoins
+    : famille === 'style'
+      ? photosStyle
+      : publicCoiffure === 'homme'
+        ? photosHomme
+        : publicCoiffure === 'femme'
+          ? photosFemme
+          : photosEnfant;
+
+  const grande = photos[0];
+  const suite = photos.slice(1);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSelectedImg(null);
+    const fermer = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOuverte(null);
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', fermer);
+    return () => window.removeEventListener('keydown', fermer);
   }, []);
 
   return (
-    <div className="min-h-screen bg-creme text-charcoal font-sans flex flex-col justify-between">
-      <div>
-        <Navbar />
-
-        {/* Header - White on Charcoal */}
-        <section className="relative py-24 bg-charcoal text-white overflow-hidden mt-[73px]">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px] z-0"></div>
-          
-          <div className="max-w-7xl mx-auto px-6 relative z-10 text-center md:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <span className="text-gold-light text-xs font-bold tracking-widest uppercase">Galerie Visuelle</span>
-              <h1 className="text-4xl md:text-5xl font-serif font-bold mt-2">Maison Fouss en Images</h1>
-              <p className="text-creme/80 text-sm md:text-base mt-4 max-w-xl leading-relaxed font-light">
-                Parcourez nos réalisations : l'art capillaire protecteur, l'apaisement de nos soins esthétiques et l'inspiration mode de notre showroom.
-              </p>
-            </motion.div>
+    <div className="min-h-screen bg-creme text-charcoal font-sans flex flex-col">
+      <Navbar />
+      <main className="max-w-7xl mx-auto px-6 pt-28 pb-16 flex-1">
+        <div className="flex justify-center mb-8 overflow-x-auto">
+          <div className="bg-white p-1.5 rounded-full border border-sable flex gap-1">
+            {familles.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { setFamille(item.id); setOuverte(null); }}
+                className={`px-6 py-3 rounded-full text-sm font-semibold ${
+                  famille === item.id ? 'bg-bordeaux text-white' : 'text-warm-brown'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
-        </section>
+        </div>
 
-        {/* Content */}
-        <main className="max-w-7xl mx-auto px-6 py-16">
-          {/* Category Filter Pills */}
-          <div className="flex justify-center mb-12 overflow-x-auto pb-4 scrollbar-none">
-            <div className="bg-white p-1.5 rounded-full shadow-sm border border-sable flex space-x-1 shrink-0">
-              {categories.map((cat) => {
-                const Icon = cat.icon;
-                const isSelected = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setActiveCategory(cat.id as CategoryType)}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs md:text-sm font-semibold tracking-wide transition-all ${
-                      isSelected
-                        ? 'bg-charcoal text-white shadow-md'
-                        : 'text-warm-brown hover:text-gold-dark hover:bg-creme'
-                    }`}
-                  >
-                    <Icon size={14} />
-                    <span>{cat.label}</span>
-                  </button>
-                );
-              })}
+        {famille === 'coiffure' && (
+          <div className="flex gap-6 mb-8 text-sm font-semibold">
+            {(['enfant', 'homme', 'femme'] as const).map((nom) => (
+              <button
+                key={nom}
+                onClick={() => setPublicCoiffure(nom)}
+                className={`capitalize pb-1 ${publicCoiffure === nom ? 'text-bordeaux border-b-2 border-bordeaux' : 'text-taupe'}`}
+              >
+                {nom}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {grande && (
+          <button onClick={() => setOuverte(0)} className="relative block w-full md:w-1/2 aspect-[3/4] rounded-3xl overflow-hidden mb-6 text-left">
+            <img src={grande.src} alt={grande.title} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 to-transparent" />
+            <div className="absolute bottom-5 left-5 text-white">
+              <p className="text-2xl font-serif font-bold">{grande.title}</p>
+              <p className="text-sm text-white/80">{photos.length} photos</p>
             </div>
-          </div>
+          </button>
+        )}
 
-          {/* Grid Display */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeCategory}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {activeCategory === 'coiffure' ? (
-                <>
-                  {/* Card Femmes */}
-                  <div className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-sable flex flex-col justify-end p-8">
-                    <img 
-                      src="/galerie/femme1.jpg" 
-                      alt="Coiffure Femmes" 
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/40 to-transparent z-0"></div>
-                    <div className="relative z-10 text-white">
-                      <span className="text-gold-light text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mb-2">
-                        <Sparkles size={10} />
-                        <span>Créativité & Protection</span>
-                      </span>
-                      <h3 className="text-2xl font-serif font-bold mb-2 text-white">Coiffure Femmes</h3>
-                      <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Nattes artistiques, tresses collées, perruques et soins profonds nappy.</p>
-                      <Link 
-                        to="/galerie/femmes" 
-                        className="inline-flex items-center justify-center bg-bordeaux text-white py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
-                      >
-                        Découvrir la Galerie
-                      </Link>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {suite.map((photo, index) => (
+            <button key={photo.src} onClick={() => setOuverte(index + 1)} className="aspect-[3/4] rounded-2xl overflow-hidden">
+              <img src={photo.src} alt={photo.title} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      </main>
 
-                  {/* Card Hommes */}
-                  <div className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-sable flex flex-col justify-end p-8">
-                    <img 
-                      src="/galerie/homme1.jpg" 
-                      alt="Coiffure Hommes" 
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/40 to-transparent z-0"></div>
-                    <div className="relative z-10 text-white">
-                      <span className="text-gold-light text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mb-2">
-                        <Sparkles size={10} />
-                        <span>Précision & Style</span>
-                      </span>
-                      <h3 className="text-2xl font-serif font-bold mb-2 text-white">Coiffure Hommes</h3>
-                      <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Dégradés américains, tailles de barbe à l'ancienne et rituels visagistes.</p>
-                      <Link 
-                        to="/galerie/hommes" 
-                        className="inline-flex items-center justify-center bg-bordeaux text-white py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
-                      >
-                        Découvrir la Galerie
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Card Enfants */}
-                  <div className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-sable flex flex-col justify-end p-8">
-                    <img 
-                      src="/galerie/enfant1.jpg" 
-                      alt="Coiffure Enfants" 
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/40 to-transparent z-0"></div>
-                    <div className="relative z-10 text-white">
-                      <span className="text-gold-light text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 mb-2">
-                        <Sparkles size={10} />
-                        <span>Douceur & Confort</span>
-                      </span>
-                      <h3 className="text-2xl font-serif font-bold mb-2 text-white">Coiffure Enfants</h3>
-                      <p className="text-creme/75 text-xs mb-6 leading-relaxed font-light">Coupes garçons rapides et tresses douces protectrices pour fillettes.</p>
-                      <Link 
-                        to="/galerie/enfants" 
-                        className="inline-flex items-center justify-center bg-bordeaux text-white py-3 px-6 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md w-full"
-                      >
-                        Découvrir la Galerie
-                      </Link>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                // 🔥 CORRECTION : Utilisation d'une assertion sécurisée 
-                galleryData[activeCategory as 'soins' | 'mode'].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => setSelectedImg(item)}
-                    className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-white shadow-sm border border-sable cursor-pointer hover:shadow-md transition-all duration-300"
-                  >
-                    <img
-                      src={item.src}
-                      alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-charcoal/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <div className="bg-white/95 text-charcoal p-3.5 rounded-full border border-sable scale-75 group-hover:scale-100 transition-all duration-300 shadow-md">
-                        <Eye size={18} className="text-gold-dark" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-4 left-4 right-4 bg-white p-4 rounded-2xl border border-sable/50 shadow-sm">
-                      <h4 className="text-sm font-bold text-charcoal font-serif">{item.title}</h4>
-                      <p className="text-[11px] text-taupe mt-1 truncate">{item.desc}</p>
-                    </div>
-                  </motion.div>
-                ))
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </main>
-      </div>
-
-      {/* Lightbox Modal */}
       <AnimatePresence>
-        {selectedImg && (
+        {ouverte !== null && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-charcoal/95 flex items-center justify-center p-4 backdrop-blur-sm"
-            onClick={() => setSelectedImg(null)}
+            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+            onClick={() => setOuverte(null)}
           >
-            <button
-              onClick={() => setSelectedImg(null)}
-              className="absolute top-6 right-6 text-creme/70 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full border border-white/10 transition-colors z-50"
-              aria-label="Fermer"
-            >
-              <X size={24} />
+            <button className="absolute top-6 right-6 text-white" aria-label="Fermer">
+              <X size={28} />
             </button>
-
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative max-w-4xl max-h-[85vh] bg-charcoal rounded-3xl border border-white/10 shadow-2xl flex flex-col overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="overflow-hidden flex items-center justify-center bg-black max-h-[65vh]">
-                <img
-                  src={selectedImg.src}
-                  alt={selectedImg.title}
-                  className="max-w-full max-h-[65vh] object-contain"
-                />
-              </div>
-              <div className="bg-charcoal p-6 text-white border-t border-white/10">
-                <h3 className="text-xl font-serif font-bold text-gold-light">{selectedImg.title}</h3>
-                <p className="text-creme/75 text-sm mt-1.5 leading-relaxed">{selectedImg.desc}</p>
-              </div>
-            </motion.div>
+            <img
+              src={photos[ouverte].src}
+              alt={photos[ouverte].title}
+              className="max-h-[85vh] max-w-full object-contain"
+              onClick={(e) => {
+                e.stopPropagation();
+                setOuverte((ouverte + 1) % photos.length);
+              }}
+            />
           </motion.div>
         )}
       </AnimatePresence>
-
       <Footer />
     </div>
   );
