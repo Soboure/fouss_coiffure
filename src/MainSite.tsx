@@ -137,16 +137,6 @@ export default function MainSite() {
 
         {/* Content */}
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16 flex flex-col items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-gold-light text-xs font-semibold uppercase tracking-widest mb-6"
-          >
-            <Sparkles size={14} className="animate-pulse" />
-            <span>Maison de Beauté & Boutique Concept</span>
-          </motion.div>
-          
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
