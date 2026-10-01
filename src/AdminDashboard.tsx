@@ -1,44 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Lock, LogOut, Calendar, Clock, Search, ShieldAlert, Sparkles, CheckCircle } from 'lucide-react';
+import { Lock, LogOut, Search, ShieldAlert } from 'lucide-react';
+
+type Reservation = {
+  id: number;
+  clientName?: string;
+  clientPhone?: string;
+  service?: string;
+  price?: string;
+  date?: string;
+  time?: string;
+  space?: string;
+  code?: string;
+  source?: string;
+  status?: string;
+};
 
 export default function AdminDashboard() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('fouss_admin_token'));
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [reservations, setReservations] = useState<any[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const isAuthenticated = !!token;
-
-  useEffect(() => {
-    if (token) {
-      fetchReservations();
-    }
-  }, [token]);
-
   const fetchReservations = () => {
     if (!token) return;
-    fetch('/api/reservations', {
-      headers: {
-        'X-Admin-Token': token
-      }
-    })
+    fetch('/api/reservations', { headers: { 'X-Admin-Token': token } })
       .then(res => {
         if (res.status === 401) {
-          handleLogout();
+          localStorage.removeItem('fouss_admin_token');
+          setToken(null);
           throw new Error('Session expirée');
         }
         return res.json();
       })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setReservations(data);
-        }
-      })
-      .catch(err => console.error("Error fetching reservations:", err));
+      .then(data => { if (Array.isArray(data)) setReservations(data); })
+      .catch(err => console.error(err));
   };
+
+  useEffect(() => { if (token) fetchReservations(); }, [token]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,339 +54,135 @@ export default function AdminDashboard() {
       if (res.ok && data.success) {
         localStorage.setItem('fouss_admin_token', data.token);
         setToken(data.token);
-      } else {
-        setError(data.error || 'Mot de passe incorrect');
-      }
-    } catch (err) {
-      console.error("Login error:", err);
+      } else setError(data.error || 'Mot de passe incorrect');
+    } catch {
       setError('Erreur de connexion avec le serveur');
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('fouss_admin_token');
-    setToken(null);
-    setPassword('');
-    setReservations([]);
-  };
-
   const updateStatus = async (id: number, status: string) => {
     if (!token) return;
-    try {
-      const res = await fetch(`/api/reservations/${id}`, {
-        method: 'PATCH',
-        headers: { 
-          'Content-Type': 'application/json',
-          'X-Admin-Token': token
-        },
-        body: JSON.stringify({ status })
-      });
-      if (res.status === 401) {
-        handleLogout();
-        return;
-      }
-      if (res.ok) {
-        setReservations(reservations.map(r => r.id === id ? { ...r, status } : r));
-      }
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
+    const res = await fetch(`/api/reservations/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Token': token },
+      body: JSON.stringify({ status })
+    });
+    if (res.status === 401) { setToken(null); return; }
+    if (res.ok) setReservations(reservations.map(r => r.id === id ? { ...r, status } : r));
   };
 
-  // Stats calculation
-  const totalBookings = reservations.length;
-  const confirmedBookings = reservations.filter(r => r.status === 'Confirmé').length;
-  const pendingBookings = reservations.filter(r => r.status === 'En attente' || !r.status).length;
+  const supprimer = async (id: number) => {
+    if (!token || !window.confirm('Supprimer cette réservation ?')) return;
+    const res = await fetch(`/api/reservations/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-Admin-Token': token }
+    });
+    if (res.ok) setReservations(reservations.filter(r => r.id !== id));
+  };
 
-  // Filtering logic
-  const filteredReservations = reservations.filter(res => {
+  const confirmed = reservations.filter(r => r.status === 'Confirmé').length;
+  const pending = reservations.filter(r => r.status !== 'Confirmé').length;
+  const visibles = reservations.filter(res => {
     if (filter === 'confirmed' && res.status !== 'Confirmé') return false;
     if (filter === 'pending' && res.status === 'Confirmé') return false;
-
-    if (searchTerm) {
-      const query = searchTerm.toLowerCase();
-      const clientName = res.clientName ? res.clientName.toLowerCase() : '';
-      const clientPhone = res.clientPhone ? res.clientPhone.toLowerCase() : '';
-      const service = res.service ? res.service.toLowerCase() : '';
-      return clientName.includes(query) || clientPhone.includes(query) || service.includes(query);
-    }
-
-    return true;
+    if (!searchTerm) return true;
+    const q = searchTerm.toLowerCase();
+    return [res.clientName, res.clientPhone, res.service, res.code].some(v => (v || '').toLowerCase().includes(q));
   });
 
-  if (!isAuthenticated) {
+  if (!token) {
     return (
-      <div className="min-h-screen bg-[#241C18] flex items-center justify-center p-6 relative overflow-hidden">
-        {/* Decorative background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#8C1913]/10 rounded-full blur-[80px] pointer-events-none"></div>
-        
-        <div className="bg-[#2B211C] p-8 md:p-10 rounded-3xl border border-white/5 max-w-md w-full relative z-10 shadow-2xl">
-          <div className="flex justify-center mb-6">
-            <div className="bg-[#241C18] p-4 rounded-full border border-white/5 shadow-inner">
-              <Lock className="text-[#8C1913]" size={32} />
-            </div>
-          </div>
-          
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center justify-center mb-2">
-              <span className="font-display text-2xl font-black tracking-tight text-white leading-none">FOUSS</span>
-              <span className="font-sans text-[0.5rem] tracking-[0.3em] text-[#8C1913] uppercase font-semibold mt-1">Maison de Beauté</span>
-            </div>
-            <h1 className="text-xl font-serif font-bold text-white mt-4">Accès Administrateur</h1>
-            <p className="text-white/60 text-xs mt-1">Saisissez votre mot de passe pour gérer les rendez-vous.</p>
-          </div>
-          
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mot de passe"
-                required
-                className="w-full border border-white/10 rounded-xl px-4 py-3.5 bg-[#241C18] text-white placeholder-white/30 focus:outline-none focus:border-[#8C1913] text-sm transition-colors"
-              />
-              {error && (
-                <p className="text-red-400 text-xs mt-2 flex items-center gap-1.5 font-semibold">
-                  <ShieldAlert size={12} />
-                  <span>{error}</span>
-                </p>
-              )}
-            </div>
-            <button 
-              type="submit" 
-              className="w-full bg-[#8C1913] hover:bg-[#6E120E] text-[#2B211C] hover:text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95"
-            >
-              Se connecter
-            </button>
-          </form>
-          
-          <div className="mt-6 text-center">
-            <Link to="/" className="text-xs text-white/50 hover:text-[#8C1913] hover:underline transition-colors">
-              Retour au site public
-            </Link>
-          </div>
-        </div>
+      <div className="min-h-screen bg-creme flex items-center justify-center p-6">
+        <form onSubmit={handleLogin} className="bg-white border border-sable rounded-3xl p-8 w-full max-w-md">
+          <div className="flex justify-center mb-4"><Lock className="text-bordeaux" /></div>
+          <h1 className="text-center font-serif text-2xl font-bold">FOUSS Admin</h1>
+          <p className="text-center text-xs text-taupe mt-1 mb-6">Le mot de passe reste sur le serveur.</p>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Mot de passe" required className="w-full border border-sable rounded-xl px-4 py-3 text-sm" />
+          {error && <p className="text-red-600 text-xs mt-2 flex items-center gap-1"><ShieldAlert size={12} />{error}</p>}
+          <button className="w-full mt-4 bg-bordeaux text-white font-bold py-3 rounded-full">Se connecter</button>
+          <Link to="/" className="block text-center text-xs text-taupe mt-4">Retour au site</Link>
+        </form>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#241C18] text-white font-sans p-6 md:p-10">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 pb-6 border-b border-white/5">
+    <div className="min-h-screen bg-creme text-charcoal">
+      <header className="bg-charcoal text-white px-6 py-5">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-display text-2xl font-black tracking-tight text-white leading-none">FOUSS</span>
-              <span className="font-sans text-[0.5rem] tracking-[0.3em] text-[#8C1913] uppercase font-semibold mt-1">Admin</span>
-              <span className="bg-[#8C1913]/10 text-[#8C1913] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#8C1913]/25 ml-2 uppercase">
-                Panel Actif
-              </span>
-            </div>
-            <p className="text-white/60 text-xs mt-1.5">Tableau de bord de gestion des prestations et réservations.</p>
+            <p className="font-serif text-2xl font-bold">FOUSS</p>
+            <p className="text-xs text-white/70">Tableau des rendez-vous</p>
           </div>
-          
-          <div className="flex items-center gap-3">
-            <Link 
-              to="/" 
-              className="text-xs font-semibold text-white/80 hover:text-white px-4 py-2.5 bg-[#2B211C] hover:bg-[#383632] rounded-xl border border-white/5 transition-colors"
-            >
-              Voir le site
-            </Link>
-            <button 
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 px-4 py-2.5 bg-red-950/20 hover:bg-red-950/40 rounded-xl border border-red-900/30 transition-colors"
-            >
-              <LogOut size={14} />
-              <span>Déconnexion</span>
-            </button>
-          </div>
-        </header>
-
-        {/* Stats Cards */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-          <div className="bg-[#2B211C] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
-            <div>
-              <p className="text-xs text-white/60 uppercase tracking-wider font-semibold">Total Demandes</p>
-              <h3 className="text-3xl font-bold mt-2 font-serif text-white">{totalBookings}</h3>
-            </div>
-            <div className="bg-[#241C18] p-3.5 rounded-2xl border border-white/5 text-white/70">
-              <Calendar size={20} />
-            </div>
-          </div>
-
-          <div className="bg-[#2B211C] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
-            <div>
-              <p className="text-xs text-white/60 uppercase tracking-wider font-semibold">Confirmées</p>
-              <h3 className="text-3xl font-bold mt-2 font-serif text-green-400">{confirmedBookings}</h3>
-            </div>
-            <div className="bg-green-950/30 p-3.5 rounded-2xl border border-green-900/20 text-green-400">
-              <CheckCircle size={20} />
-            </div>
-          </div>
-
-          <div className="bg-[#2B211C] p-6 rounded-3xl border border-white/5 shadow-lg flex items-center justify-between">
-            <div>
-              <p className="text-xs text-white/60 uppercase tracking-wider font-semibold">En attente</p>
-              <h3 className="text-3xl font-bold mt-2 font-serif text-[#8C1913]">{pendingBookings}</h3>
-            </div>
-            <div className="bg-[#8C1913]/10 p-3.5 rounded-2xl border border-[#8C1913]/20 text-[#8C1913] animate-pulse">
-              <Clock size={20} />
-            </div>
-          </div>
-        </section>
-
-        {/* Filters bar */}
-        <section className="flex flex-col md:flex-row gap-4 justify-between items-center mb-8 bg-[#2B211C] p-4 rounded-2xl border border-white/5 shadow-md">
-          {/* Search bar */}
-          <div className="relative w-full md:max-w-xs">
-            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-white/40 pointer-events-none">
-              <Search size={16} />
-            </span>
-            <input 
-              type="text" 
-              placeholder="Rechercher client, téléphone..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#241C18] border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#8C1913] text-white placeholder-white/30"
-            />
-          </div>
-
-          {/* Status Tabs */}
-          <div className="flex bg-[#241C18] p-1 rounded-xl border border-white/10 w-full md:w-auto shrink-0 overflow-x-auto">
-            <button 
-              onClick={() => setFilter('all')}
-              className={`flex-1 md:flex-none px-5 py-2 text-xs font-semibold rounded-lg transition-all ${
-                filter === 'all' ? 'bg-[#8C1913] text-white font-bold' : 'text-white/60 hover:text-white'
-              }`}
-            >
-              Tous ({totalBookings})
-            </button>
-            <button 
-              onClick={() => setFilter('pending')}
-              className={`flex-1 md:flex-none px-5 py-2 text-xs font-semibold rounded-lg transition-all ${
-                filter === 'pending' ? 'bg-[#8C1913] text-white font-bold' : 'text-white/60 hover:text-white'
-              }`}
-            >
-              En attente ({pendingBookings})
-            </button>
-            <button 
-              onClick={() => setFilter('confirmed')}
-              className={`flex-1 md:flex-none px-5 py-2 text-xs font-semibold rounded-lg transition-all ${
-                filter === 'confirmed' ? 'bg-[#8C1913] text-white font-bold' : 'text-white/60 hover:text-white'
-              }`}
-            >
-              Confirmés ({confirmedBookings})
-            </button>
-          </div>
-        </section>
-
-        {/* Data Table */}
-        <div className="bg-[#2B211C] rounded-3xl shadow-xl border border-white/5 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#241C18] border-b border-white/5">
-                  <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50">Client / Contact</th>
-                  <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50">Prestation</th>
-                  <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50">Date & Heure</th>
-                  <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50">Espace</th>
-                  <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50">Statut</th>
-                  <th className="p-5 text-xs font-bold uppercase tracking-wider text-white/50 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {filteredReservations.map(res => (
-                  <tr key={res.id} className="hover:bg-white/5 transition-colors">
-                    {/* Client Name & Phone */}
-                    <td className="p-5">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-[#241C18] w-9 h-9 rounded-full flex items-center justify-center border border-white/10 text-[#8C1913] font-bold text-xs uppercase shadow-inner">
-                          {res.clientName ? res.clientName.substring(0,2) : 'CL'}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-sm text-white">{res.clientName}</p>
-                          <p className="text-xs text-white/40 mt-0.5">{res.clientPhone}</p>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Service */}
-                    <td className="p-5">
-                      <p className="text-sm font-medium text-white/90">{res.service}</p>
-                    </td>
-
-                    {/* Date / Time */}
-                    <td className="p-5 text-sm text-white/80">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-medium">{res.date}</span>
-                        <span className="text-xs text-white/40 flex items-center gap-1">
-                          <Clock size={12} className="text-[#8C1913]" />
-                          {res.time}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Space */}
-                    <td className="p-5">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                        res.space === 'VIP' 
-                          ? 'bg-[#8C1913]/10 text-[#8C1913] border-[#8C1913]/20' 
-                          : 'bg-[#241C18] text-white/50 border-white/5'
-                      }`}>
-                        {res.space === 'VIP' ? 'SUITE VIP' : 'Standard'}
-                      </span>
-                    </td>
-
-                    {/* Status badge */}
-                    <td className="p-5">
-                      {res.status === 'Confirmé' ? (
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/10 text-green-400 border border-green-500/20 inline-flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                          Confirmé
-                        </span>
-                      ) : (
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#8C1913]/10 text-[#8C1913] border border-[#8C1913]/20 inline-flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#8C1913]"></span>
-                          En attente
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Actions */}
-                    <td className="p-5 text-right">
-                      {res.status !== 'Confirmé' ? (
-                        <button 
-                          onClick={() => updateStatus(res.id, 'Confirmé')} 
-                          className="text-xs font-bold text-white bg-[#8C1913] hover:bg-[#6E120E] hover:text-white px-4 py-2 rounded-xl transition-all shadow-md active:scale-95"
-                        >
-                          Confirmer
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={() => updateStatus(res.id, 'En attente')} 
-                          className="text-xs font-semibold text-white/60 hover:text-white px-4 py-2 hover:bg-[#241C18] rounded-xl transition-all"
-                        >
-                          Remettre en attente
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                
-                {filteredReservations.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="p-10 text-center text-white/40 text-sm">
-                      Aucune réservation trouvée.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className="flex gap-2">
+            <Link to="/" className="text-xs px-4 py-2 rounded-full border border-white/20">Voir le site</Link>
+            <button onClick={() => { localStorage.removeItem('fouss_admin_token'); setToken(null); }} className="text-xs px-4 py-2 rounded-full bg-white text-charcoal inline-flex items-center gap-1"><LogOut size={14} /> Sortir</button>
           </div>
         </div>
-      </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto p-6">
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {[['Total', reservations.length], ['En attente', pending], ['Confirmées', confirmed]].map(([label, n]) => (
+            <div key={String(label)} className="bg-white border border-sable rounded-2xl p-4">
+              <p className="text-xs text-taupe uppercase">{label}</p>
+              <p className="text-2xl font-serif font-bold mt-1">{n}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-3 mb-4">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-3 text-taupe" />
+            <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Nom, téléphone, prestation ou code" className="w-full bg-white border border-sable rounded-full pl-9 pr-4 py-2.5 text-sm" />
+          </div>
+          <div className="flex gap-2 text-xs font-semibold">
+            {([['all', 'Tous'], ['pending', 'En attente'], ['confirmed', 'Confirmés']] as const).map(([id, label]) => (
+              <button key={id} onClick={() => setFilter(id)} className={`px-4 py-2 rounded-full ${filter === id ? 'bg-bordeaux text-white' : 'bg-white border border-sable'}`}>{label}</button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white border border-sable rounded-3xl overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="text-xs uppercase text-taupe border-b border-sable">
+              <tr>
+                {['Client', 'Prestation', 'Prix', 'Quand', 'Code', 'Source', 'Statut', ''].map(h => <th key={h} className="p-4">{h}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {visibles.map(res => (
+                <tr key={res.id} className="border-b border-sable/70 align-top">
+                  <td className="p-4">
+                    <p className="font-semibold">{res.clientName}</p>
+                    <p className="text-xs text-taupe">{res.clientPhone}</p>
+                  </td>
+                  <td className="p-4">
+                    <p>{res.service}</p>
+                    <p className="text-xs text-taupe">{res.space === 'VIP' ? 'Suite VIP' : 'Standard'}</p>
+                  </td>
+                  <td className="p-4">{res.price || '—'}</td>
+                  <td className="p-4">{res.date}<br /><span className="text-xs text-taupe">{res.time}</span></td>
+                  <td className="p-4 font-mono text-xs">{res.code || '—'}</td>
+                  <td className="p-4 capitalize">{res.source || 'site'}</td>
+                  <td className="p-4">
+                    <span className={`text-xs px-2 py-1 rounded-full ${res.status === 'Confirmé' ? 'bg-green-100 text-green-800' : 'bg-creme text-bordeaux'}`}>
+                      {res.status === 'Confirmé' ? 'Confirmé' : 'En attente'}
+                    </span>
+                  </td>
+                  <td className="p-4 text-right space-y-2">
+                    <button onClick={() => updateStatus(res.id, res.status === 'Confirmé' ? 'En attente' : 'Confirmé')} className="block ml-auto text-xs font-bold bg-bordeaux text-white px-3 py-2 rounded-full">
+                      {res.status === 'Confirmé' ? 'Remettre en attente' : 'Confirmer'}
+                    </button>
+                    <button onClick={() => supprimer(res.id)} className="block ml-auto text-xs text-red-700">Supprimer</button>
+                  </td>
+                </tr>
+              ))}
+              {visibles.length === 0 && <tr><td colSpan={8} className="p-8 text-center text-taupe">Aucune réservation.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </main>
     </div>
   );
 }

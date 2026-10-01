@@ -53,9 +53,15 @@ const initDb = async () => {
           clientName TEXT,
           clientPhone TEXT,
           status TEXT DEFAULT 'En attente',
+          code TEXT,
+          price TEXT,
+          source TEXT DEFAULT 'site',
           createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `);
+      for (const colonne of ['code TEXT', 'price TEXT', "source TEXT DEFAULT 'site'"]) {
+        try { db.exec(`ALTER TABLE reservations ADD COLUMN ${colonne}`); } catch (e) {}
+      }
       isInitialized = true;
       console.log("SQLite table checked/created");
     } catch (e) {
@@ -73,9 +79,15 @@ const initDb = async () => {
           clientName VARCHAR(255),
           clientPhone VARCHAR(255),
           status VARCHAR(255) DEFAULT 'En attente',
+          code VARCHAR(32),
+          price VARCHAR(255),
+          source VARCHAR(32) DEFAULT 'site',
           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `;
+      await sql`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS code VARCHAR(32)`;
+      await sql`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS price VARCHAR(255)`;
+      await sql`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS source VARCHAR(32) DEFAULT 'site'`;
       isInitialized = true;
       console.log("Postgres table checked/created");
     } catch (err) {
@@ -103,24 +115,26 @@ app.get('/api/reservations', adminAuth, async (req, res) => {
 app.post('/api/reservations', async (req, res) => {
   try {
     await initDb();
-    const { service, date, time, space, clientName, clientPhone } = req.body;
+    const { service, date, time, space, clientName, clientPhone, code, price, source } = req.body;
     
     if (!service || !date || !time || !clientName || !clientPhone) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+    const espace = space || 'Standard';
+    const origine = source || 'site';
 
     if (usePostgres) {
       const { rows } = await sql`
-        INSERT INTO reservations (service, date, time, space, clientName, clientPhone)
-        VALUES (${service}, ${date}, ${time}, ${space || 'Standard'}, ${clientName}, ${clientPhone})
-        RETURNING id
+        INSERT INTO reservations (service, date, time, space, clientName, clientPhone, code, price, source)
+        VALUES (${service}, ${date}, ${time}, ${espace}, ${clientName}, ${clientPhone}, ${code || null}, ${price || null}, ${origine})
+        RETURNING id, code
       `;
-      res.json({ id: rows[0].id, success: true });
+      res.json({ id: rows[0].id, code: rows[0].code, success: true });
     } else {
       if (!db) throw new Error('SQLite database not initialized');
-      const stmt = db.prepare('INSERT INTO reservations (service, date, time, space, clientName, clientPhone) VALUES (?, ?, ?, ?, ?, ?)');
-      const info = stmt.run(service, date, time, space || 'Standard', clientName, clientPhone);
-      res.json({ id: info.lastInsertRowid, success: true });
+      const stmt = db.prepare('INSERT INTO reservations (service, date, time, space, clientName, clientPhone, code, price, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+      const info = stmt.run(service, date, time, espace, clientName, clientPhone, code || null, price || null, origine);
+      res.json({ id: info.lastInsertRowid, code, success: true });
     }
   } catch (err: any) {
     console.error('POST reservation error:', err);
@@ -148,5 +162,23 @@ app.patch('/api/reservations/:id', adminAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to update reservation' });
   }
 });
+
+
+app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
+  try {
+    await initDb();
+    if (usePostgres) {
+      await sql`DELETE FROM reservations WHERE id = ${req.params.id}`;
+    } else {
+      const stmt = db.prepare('DELETE FROM reservations WHERE id = ?');
+      stmt.run(req.params.id);
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete reservation' });
+  }
+});
+
 
 export default app;

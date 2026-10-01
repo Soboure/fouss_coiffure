@@ -38,6 +38,7 @@ const team = [
 
 export default function MainSite() {
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [ticketCode, setTicketCode] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCat, setSelectedCat] = useState<'coiffure' | 'soins' | 'boutique'>('coiffure');
   
@@ -66,16 +67,29 @@ export default function MainSite() {
     }
   };
 
+  const prixDemande = () => {
+    const details = allServicesList.find(s => s.name === formData.service);
+    const prix = details?.price || '';
+    if (formData.space === 'VIP' && !prix.startsWith('+')) return `${prix} + suite 5 000 FCFA`;
+    return prix;
+  };
+
   const handleBook = async (e: React.FormEvent) => {
     e.preventDefault();
     setBookingStatus('loading');
+    const lettres = (formData.lastName || 'CLI').replace(/[^a-zA-Z]/g, '').slice(0, 3).toUpperCase() || 'CLI';
+    const code = `FOUSS-${lettres}-${1000 + Math.floor(Math.random() * 9000)}`;
+    setTicketCode(code);
     try {
       const res = await fetch('/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          clientName: `${formData.firstName} ${formData.lastName}`
+          clientName: `${formData.firstName} ${formData.lastName}`,
+          code,
+          price: prixDemande(),
+          source: 'site'
         })
       });
       if (res.ok) {
@@ -275,15 +289,17 @@ export default function MainSite() {
                 <p className="text-warm-brown text-sm mt-2">Gardez le ticket. Le salon peut encore confirmer le créneau.</p>
                 <div ref={ticketRef} className="bg-creme border border-sable rounded-2xl p-5 mt-6 text-left text-sm">
                   <p className="font-bold">FOUSS · Ticket</p>
+                  <p className="mt-1 font-mono text-xs">{ticketCode}</p>
                   <p className="mt-3">{formData.firstName} {formData.lastName}</p>
                   <p>{formData.clientPhone}</p>
                   <p className="mt-2">{formData.service}</p>
+                  <p>{prixDemande()}</p>
                   <p>{formData.date} à {formData.time}</p>
                   <p>{formData.space === 'VIP' ? 'Suite VIP' : 'Standard'}</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
                   <button type="button" onClick={downloadTicket} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">Télécharger le ticket</button>
-                  <button type="button" onClick={() => { setBookingStatus('idle'); setCurrentStep(1); setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' }); }} className="flex-1 border border-sable py-3 rounded-full text-xs font-semibold">Nouvelle demande</button>
+                  <button type="button" onClick={() => { setBookingStatus('idle'); setCurrentStep(1); setTicketCode(''); setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' }); }} className="flex-1 border border-sable py-3 rounded-full text-xs font-semibold">Nouvelle demande</button>
                 </div>
               </div>
             ) : (
