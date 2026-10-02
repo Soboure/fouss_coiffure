@@ -331,14 +331,21 @@ export default function MainSite() {
                         <button key={id} type="button" onClick={() => { setSelectedCat(id); setFormData({ ...formData, service: '' }); }} className={`px-3 py-2 rounded-full ${selectedCat === id ? 'bg-charcoal text-white' : 'bg-creme'}`}>{label}</button>
                       ))}
                     </div>
-                    <label className="block text-xs font-bold uppercase text-warm-brown">Prestation</label>
-                    <select required value={formData.service} onChange={e => setFormData({ ...formData, service: e.target.value })} className="w-full border border-sable rounded-xl px-4 py-3 bg-white text-sm">
-                      <option value="">Choisir une prestation</option>
+                    <p className="text-xs font-bold uppercase text-warm-brown">Prestation</p>
+                    <div className="grid gap-2">
                       {serviceCategories[selectedCat].map(s => (
-                        <option key={s.id} value={s.name}>{s.name} — {s.price}</option>
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, service: s.name })}
+                          className={`text-left rounded-2xl border px-4 py-3 ${formData.service === s.name ? 'border-bordeaux bg-creme' : 'border-sable bg-white'}`}
+                        >
+                          <span className="block text-sm font-semibold">{s.name}</span>
+                          <span className="block text-xs text-bordeaux mt-1">{s.price} · {s.duration}</span>
+                        </button>
                       ))}
-                    </select>
-                    {formData.service && <p className="text-xs text-warm-brown">{getSelectedServiceDetails()?.desc} · {getSelectedServiceDetails()?.duration}</p>}
+                    </div>
+                    {formData.service && <p className="text-xs text-warm-brown">{getSelectedServiceDetails()?.desc}</p>}
                     <p className="text-sm font-semibold pt-2">Où ?</p>
                     <div className="grid grid-cols-2 gap-3">
                       <button type="button" onClick={() => setFormData({ ...formData, space: 'Standard' })} className={`border rounded-2xl p-3 text-left ${formData.space === 'Standard' ? 'border-bordeaux bg-creme' : 'border-sable'}`}>
@@ -357,13 +364,15 @@ export default function MainSite() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold uppercase text-warm-brown mb-2">Jour</label>
-                      <input required type="date" min={new Date().toISOString().split('T')[0]} value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} className="w-full border border-sable rounded-xl px-4 py-3 text-sm" />
+                      <input required type="date" min={new Date().toISOString().split('T')[0]} value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} className="w-full border border-sable rounded-2xl px-4 py-3 text-sm bg-white text-charcoal" />
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-warm-brown mb-2">Heure</label>
-                      <select value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })} className="w-full border border-sable rounded-xl px-4 py-3 text-sm">
-                        {['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'].map(h => <option key={h}>{h}</option>)}
-                      </select>
+                    <div className="sm:col-span-2">
+                      <p className="text-xs font-bold uppercase text-warm-brown mb-2">Heure</p>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                        {['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'].map(h => (
+                          <button key={h} type="button" onClick={() => setFormData({ ...formData, time: h })} className={`rounded-full py-2 text-sm font-semibold ${formData.time === h ? 'bg-bordeaux text-white' : 'bg-white border border-sable'}`}>{h}</button>
+                        ))}
+                      </div>
                     </div>
                     <p className="sm:col-span-2 text-xs text-taupe">Le salon est ouvert de 09h à 23h, du lundi au samedi. 13h n'est pas proposé.</p>
                   </div>
