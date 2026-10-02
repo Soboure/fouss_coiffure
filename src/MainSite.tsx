@@ -1,7 +1,8 @@
 // Rôle de ce fichier : la page d'accueil.
 // Hero, trois portes, équipe, puis le formulaire de rendez-vous en trois étapes.
+// Étape 1 : prestation et Standard ou Suite VIP. Étape 2 : jour et heure. Étape 3 : nom et téléphone.
 // À l'envoi, la fiche part vers /api/reservations avec source = site.
-// Le code du ticket est créé une seule fois, ici, avant l'envoi.
+// Le code du ticket est créé une seule fois, ici, avant l'envoi. Forme FOUSS-XXX-1234.
 
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';

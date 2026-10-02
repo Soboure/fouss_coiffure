@@ -1,5 +1,6 @@
 // Rôle de ce fichier : la page des prix.
 // Coiffure se divise en Femme, Homme et Enfant. Enfant n'a pas encore de prix.
+// Les montants viennent de src/data/services.ts. On ne les réécrit pas dans cette page.
 // Réserver ouvre le formulaire de l'accueil. La prestation n'est pas encore préremplie.
 
 import React, { useState } from 'react';

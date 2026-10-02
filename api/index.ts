@@ -1,7 +1,9 @@
 // Rôle de ce fichier : la porte des rendez-vous.
 // Le site et l'application envoient une fiche en POST /api/reservations.
-// Lire, confirmer ou supprimer exige le jeton administrateur.
+// Champs utiles : service, date, time, clientName, clientPhone, space, code, price, source.
+// Lire, confirmer ou supprimer exige le jeton administrateur, envoyé dans X-Admin-Token.
 // Si POSTGRES_URL existe, les fiches vont dans Postgres. Sinon, dans salon.db, en local seulement.
+// Postgres renvoie les colonnes en minuscules : clientname, pas clientName.
 
 import express from 'express';
 import { sql } from '@vercel/postgres';

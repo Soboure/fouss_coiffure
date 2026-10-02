@@ -1,7 +1,8 @@
 // Rôle de ce fichier : le tableau du salon, adresse /admin.
-// Le mot de passe ne lit pas la base tout seul : il obtient un jeton.
+// Le mot de passe ne lit pas la base tout seul : il obtient un jeton, gardé dans le navigateur.
 // Postgres renvoie clientname et clientphone en minuscules : on lit les deux écritures.
 // Confirmer change le statut. Il n'y a plus de bouton Supprimer.
+// La colonne Source dit si la fiche vient du site ou de l'application.
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
