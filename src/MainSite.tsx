@@ -61,7 +61,7 @@ export default function MainSite() {
       element.style.boxShadow = 'none';
       const canvas = await html2canvas(element, {
         scale: 3,
-        backgroundColor: '#F8F7F4',
+        backgroundColor: '#FFFFFF',
         useCORS: true
       });
       element.style.boxShadow = '';
@@ -293,15 +293,21 @@ export default function MainSite() {
                 <CheckCircle className="text-green-600 mx-auto" size={40} />
                 <h3 className="text-2xl font-serif font-bold mt-4">Demande envoyée</h3>
                 <p className="text-warm-brown text-sm mt-2">Gardez le ticket. Le salon peut encore confirmer le créneau.</p>
-                <div ref={ticketRef} className="bg-creme border border-sable rounded-2xl p-5 mt-6 text-left text-sm">
-                  <p className="font-bold">FOUSS · Ticket</p>
-                  <p className="mt-1 font-mono text-xs">{ticketCode}</p>
-                  <p className="mt-3">{formData.firstName} {formData.lastName}</p>
-                  <p>{formData.clientPhone}</p>
-                  <p className="mt-2">{formData.service}</p>
-                  <p>{prixDemande()}</p>
-                  <p>{formData.date} à {formData.time}</p>
-                  <p>{formData.space === 'VIP' ? 'Suite VIP' : 'Standard'}</p>
+                <div ref={ticketRef} className="bg-white border border-charcoal rounded-3xl p-6 mt-6 text-left max-w-sm mx-auto">
+                  <img src="/logo-fouss.png" alt="Fouss Coiffure" className="h-12 w-auto mx-auto" />
+                  <p className="text-center text-[10px] tracking-[0.25em] uppercase text-taupe mt-3">Ticket de réservation</p>
+                  <p className="text-center font-mono text-sm font-bold mt-2">{ticketCode}</p>
+                  <div className="border-t border-dashed border-sable my-4" />
+                  <div className="space-y-2 text-sm">
+                    <p><span className="text-taupe text-xs uppercase">Client</span><br />{formData.firstName} {formData.lastName}</p>
+                    <p><span className="text-taupe text-xs uppercase">Téléphone</span><br />{formData.clientPhone}</p>
+                    <p><span className="text-taupe text-xs uppercase">Prestation</span><br />{formData.service}</p>
+                    <p><span className="text-taupe text-xs uppercase">Prix</span><br />{prixDemande()}</p>
+                    <p><span className="text-taupe text-xs uppercase">Quand</span><br />{formData.date} à {formData.time}</p>
+                    <p><span className="text-taupe text-xs uppercase">Espace</span><br />{formData.space === 'VIP' ? 'Suite VIP' : 'Standard'}</p>
+                  </div>
+                  <div className="border-t border-dashed border-sable my-4" />
+                  <p className="text-center text-[10px] text-taupe uppercase tracking-wider">Haie Vive, Cotonou · À présenter à l'accueil</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
                   <button type="button" onClick={downloadTicket} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">Télécharger le ticket</button>
