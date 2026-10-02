@@ -31,13 +31,8 @@ export default function Navbar() {
     <nav className="fixed w-full z-50 glass-panel border-b border-sable/55 py-4 top-0 left-0 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Logo */}
-        <Link to="/#home" onClick={handleLinkClick} className="flex flex-col items-center justify-center cursor-pointer group">
-          <span className="font-display text-3xl font-black tracking-tight text-charcoal leading-none group-hover:scale-[1.02] transition-transform">
-            FOUSS
-          </span>
-          <span className="font-sans text-[0.6rem] tracking-[0.3em] text-taupe uppercase font-bold mt-1">
-            Maison de Beauté
-          </span>
+        <Link to="/#home" onClick={handleLinkClick} className="flex items-center cursor-pointer">
+          <img src="/logo-fouss.png" alt="Fouss Coiffure" className="h-12 w-auto" />
         </Link>
 
         {/* Desktop Navigation Links */}
