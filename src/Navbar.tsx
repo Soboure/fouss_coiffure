@@ -1,6 +1,7 @@
 // Rôle de ce fichier : la barre fixe en haut.
 // Le logo renvoie à l'accueil. Les liens ouvrent Tarifs, Galerie et l'équipe.
-// Réserver descend au formulaire. Sur téléphone, le menu se replie.
+// Réserver descend au formulaire de l'accueil. Sur téléphone, le menu se replie.
+// Le fichier du logo est public/logo-fouss.png.
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';

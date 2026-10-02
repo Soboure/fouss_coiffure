@@ -1,5 +1,6 @@
 // Rôle de ce fichier : le pied de page, commun aux pages publiques.
 // Il affiche le contact et le bouton WhatsApp. Il ne gère pas les réservations.
+// L'adresse affichée ici doit rester Haie Vive, Cotonou, la même que l'application.
 
 import React from 'react';
 import { Phone, Clock, MapPin } from 'lucide-react';
