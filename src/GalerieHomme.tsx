@@ -1,3 +1,6 @@
+// Ancienne page, encore ouverte par /galerie/hommes.
+// La galerie principale est Galerie.tsx. Ne pas y ajouter de nouvelles photos.
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, X, Eye, Sparkles } from 'lucide-react';

@@ -1,3 +1,8 @@
+// Rôle de ce fichier : la porte des rendez-vous.
+// Le site et l'application envoient une fiche en POST /api/reservations.
+// Lire, confirmer ou supprimer exige le jeton administrateur.
+// Si POSTGRES_URL existe, les fiches vont dans Postgres. Sinon, dans salon.db, en local seulement.
+
 import express from 'express';
 import { sql } from '@vercel/postgres';
 import crypto from 'crypto';
@@ -8,7 +13,7 @@ app.use(express.json());
 // In-memory active admin sessions
 const sessions = new Set<string>();
 
-// Login route for administrator
+// Connexion : le mot de passe vient de ADMIN_PASSWORD, sinon du secours écrit plus bas.
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
   const expectedPassword = process.env.ADMIN_PASSWORD || 'fouss2024';
@@ -20,7 +25,7 @@ app.post('/api/admin/login', (req, res) => {
   return res.status(401).json({ error: 'Mot de passe incorrect' });
 });
 
-// Admin authentication middleware
+// Vérifie le jeton. Sans lui, la liste et les changements sont refusés.
 const adminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const token = req.headers['x-admin-token'];
   if (!token || !sessions.has(token as string)) {
@@ -96,6 +101,7 @@ const initDb = async () => {
   }
 };
 
+// Liste des fiches. Réservée à l'administrateur.
 app.get('/api/reservations', adminAuth, async (req, res) => {
   try {
     await initDb();
@@ -112,6 +118,7 @@ app.get('/api/reservations', adminAuth, async (req, res) => {
   }
 });
 
+// Création d'une fiche. Ouvert au site et à l'application, sans mot de passe.
 app.post('/api/reservations', async (req, res) => {
   try {
     await initDb();
@@ -146,6 +153,7 @@ app.post('/api/reservations', async (req, res) => {
   }
 });
 
+// Change le statut : En attente ou Confirmé.
 app.patch('/api/reservations/:id', adminAuth, async (req, res) => {
   try {
     const { status } = req.body;
@@ -164,6 +172,7 @@ app.patch('/api/reservations/:id', adminAuth, async (req, res) => {
 });
 
 
+// Suppression technique. Le bouton n'est plus dans le tableau.
 app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
   try {
     await initDb();

@@ -1,3 +1,7 @@
+// Rôle de ce fichier : la galerie.
+// Barre Coiffure, Soins, Style. Sous Coiffure : Enfant, Homme, Femme.
+// Style, c'est le showroom en photo. Un toucher ouvre la photo en grand.
+
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';

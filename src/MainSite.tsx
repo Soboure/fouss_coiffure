@@ -1,3 +1,8 @@
+// Rôle de ce fichier : la page d'accueil.
+// Hero, trois portes, équipe, puis le formulaire de rendez-vous en trois étapes.
+// À l'envoi, la fiche part vers /api/reservations avec source = site.
+// Le code du ticket est créé une seule fois, ici, avant l'envoi.
+
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Download, Sparkles, Calendar, Clock, ArrowRight, ArrowLeft, Shield, Compass, ShoppingBag } from 'lucide-react';

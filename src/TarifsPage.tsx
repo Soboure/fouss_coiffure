@@ -1,3 +1,7 @@
+// Rôle de ce fichier : la page des prix.
+// Coiffure se divise en Femme, Homme et Enfant. Enfant n'a pas encore de prix.
+// Réserver ouvre le formulaire de l'accueil. La prestation n'est pas encore préremplie.
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, Sparkles, Calendar } from 'lucide-react';

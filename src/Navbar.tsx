@@ -1,3 +1,7 @@
+// Rôle de ce fichier : la barre fixe en haut.
+// Le logo renvoie à l'accueil. Les liens ouvrent Tarifs, Galerie et l'équipe.
+// Réserver descend au formulaire. Sur téléphone, le menu se replie.
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Calendar } from 'lucide-react';

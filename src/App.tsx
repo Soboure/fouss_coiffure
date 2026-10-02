@@ -1,3 +1,7 @@
+// Rôle de ce fichier : les routes, c'est-à-dire quelle adresse ouvre quelle page.
+// / accueil, /tarifs tarifs, /galerie galerie, /admin tableau du salon.
+// Les anciennes adresses /galerie/femmes, /hommes et /enfants restent pour les liens déjà partagés.
+
 import React, { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import MainSite from './MainSite';

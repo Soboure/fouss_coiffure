@@ -1,3 +1,7 @@
+/* Rôle de ce fichier : les couleurs du site, les mêmes que l'application.
+   Bordeaux #8C1913, crème #F7F3EF, texte #2B211C, bordure #E7DDD6.
+   Les pages utilisent ces noms (bg-creme, text-charcoal, bg-bordeaux), pas des couleurs au hasard. */
+
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 @import "tailwindcss";
 

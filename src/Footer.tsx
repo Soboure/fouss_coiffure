@@ -1,3 +1,6 @@
+// Rôle de ce fichier : le pied de page, commun aux pages publiques.
+// Il affiche le contact et le bouton WhatsApp. Il ne gère pas les réservations.
+
 import React from 'react';
 import { Phone, Clock, MapPin } from 'lucide-react';
 

@@ -1,3 +1,7 @@
+// Rôle de ce fichier : la liste des prix. Ce n'est pas la base de données.
+// Changer un tarif se fait ici, puis on renvoie le site.
+// Les rendez-vous, eux, sont enregistrés par api/index.ts.
+
 export interface Service {
   id: string;
   name: string;
