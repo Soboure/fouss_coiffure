@@ -5,7 +5,9 @@ import { Lock, LogOut, Search, ShieldAlert } from 'lucide-react';
 type Reservation = {
   id: number;
   clientName?: string;
+  clientname?: string;
   clientPhone?: string;
+  clientphone?: string;
   service?: string;
   price?: string;
   date?: string;
@@ -78,7 +80,7 @@ export default function AdminDashboard() {
     if (filter === 'pending' && res.status === 'Confirmé') return false;
     if (!searchTerm) return true;
     const q = searchTerm.toLowerCase();
-    return [res.clientName, res.clientPhone, res.service, res.code].some(v => (v || '').toLowerCase().includes(q));
+    return [res.clientName, res.clientname, res.clientPhone, res.clientphone, res.service, res.code].some(v => (v || '').toLowerCase().includes(q));
   });
 
   if (!token) {
@@ -145,8 +147,8 @@ export default function AdminDashboard() {
               {visibles.map(res => (
                 <tr key={res.id} className="border-b border-sable/70 align-top">
                   <td className="p-4">
-                    <p className="font-semibold">{res.clientName}</p>
-                    <p className="text-xs text-taupe">{res.clientPhone}</p>
+                    <p className="font-semibold">{res.clientName || res.clientname || '—'}</p>
+                    <p className="text-xs text-taupe">{res.clientPhone || res.clientphone || '—'}</p>
                   </td>
                   <td className="p-4">
                     <p>{res.service}</p>
