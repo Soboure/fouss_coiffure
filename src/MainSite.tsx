@@ -7,7 +7,6 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Download, Sparkles, Calendar, Clock, ArrowRight, ArrowLeft, Shield, Compass, ShoppingBag } from 'lucide-react';
-import html2canvas from 'html2canvas';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './Navbar';
 import Footer from './Footer';
