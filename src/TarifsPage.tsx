@@ -1,7 +1,7 @@
 // Rôle de ce fichier : la page des prix.
 // Coiffure se divise en Femme, Homme et Enfant. Enfant n'a pas encore de prix.
 // Les montants viennent de src/data/services.ts. On ne les réécrit pas dans cette page.
-// Réserver ouvre le formulaire de l'accueil. La prestation n'est pas encore préremplie.
+// Réserver renvoie au formulaire avec la prestation déjà choisie.
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -46,7 +46,7 @@ export default function TarifsPage() {
           <span className="text-gold-light text-xs font-bold tracking-widest uppercase">Notre catalogue</span>
           <h1 className="text-4xl md:text-5xl font-serif font-bold mt-2">Tarifs & Prestations</h1>
           <p className="text-creme/80 text-sm md:text-base mt-4 max-w-xl leading-relaxed font-light">
-            Les prix affichés sont ceux du salon. Réserver ouvre le formulaire, la prestation se choisit encore à l'étape 1.
+            Choisissez femme, homme ou enfant, puis Réserver. La prestation suit dans le formulaire.
           </p>
         </div>
       </section>
@@ -107,7 +107,7 @@ export default function TarifsPage() {
                     {service.duration}
                   </p>
                   <Link
-                    to="/#booking"
+                    to={`/?service=${encodeURIComponent(service.name)}#booking`}
                     className="mt-5 inline-flex items-center justify-center bg-bordeaux text-white px-5 py-3 rounded-full text-xs font-bold uppercase tracking-wider"
                   >
                     Réserver

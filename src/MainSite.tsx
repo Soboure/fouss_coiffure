@@ -4,14 +4,14 @@
 // À l'envoi, la fiche part vers /api/reservations avec source = site.
 // Le code du ticket est créé une seule fois, ici, avant l'envoi. Forme FOUSS-XXX-1234.
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Download, Sparkles, Calendar, Clock, ArrowRight, ArrowLeft, Shield, Compass, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-import { serviceCategories, allServicesList } from './data/services';
+import { allServicesList } from './data/services';
 
 const pillars = [
   {
@@ -45,12 +45,18 @@ export default function MainSite() {
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const [ticketCode, setTicketCode] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedCat, setSelectedCat] = useState<'coiffure' | 'soins' | 'boutique'>('coiffure');
   
   // Form state
   const [formData, setFormData] = useState({
     service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: ''
   });
+
+  useEffect(() => {
+    const nom = new URLSearchParams(window.location.search).get('service');
+    if (!nom) return;
+    setFormData(actuel => ({ ...actuel, service: nom }));
+    document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   const ticketRef = useRef<HTMLDivElement>(null);
 
@@ -393,27 +399,10 @@ export default function MainSite() {
 
                 {currentStep === 1 && (
                   <div className="space-y-4">
-                    <p className="text-sm font-semibold">Que souhaitez-vous ?</p>
-                    <div className="flex gap-2 text-xs font-semibold">
-                      {([['coiffure', 'Coiffure'], ['soins', 'Soins'], ['boutique', 'Showroom']] as const).map(([id, label]) => (
-                        <button key={id} type="button" onClick={() => { setSelectedCat(id); setFormData({ ...formData, service: '' }); }} className={`px-3 py-2 rounded-full ${selectedCat === id ? 'bg-charcoal text-white' : 'bg-creme'}`}>{label}</button>
-                      ))}
-                    </div>
-                    <p className="text-xs font-bold uppercase text-warm-brown">Prestation</p>
-                    <div className="grid gap-2">
-                      {serviceCategories[selectedCat].map(s => (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, service: s.name })}
-                          className={`text-left rounded-2xl border px-4 py-3 ${formData.service === s.name ? 'border-bordeaux bg-creme' : 'border-sable bg-white'}`}
-                        >
-                          <span className="block text-sm font-semibold">{s.name}</span>
-                          <span className="block text-xs text-bordeaux mt-1">{s.price} · {s.duration}</span>
-                        </button>
-                      ))}
-                    </div>
-                    {formData.service && <p className="text-xs text-warm-brown">{getSelectedServiceDetails()?.desc}</p>}
+                    <p className="text-sm font-semibold">Prestation</p>
+                    <p className="text-sm text-warm-brown">Allez dans Tarifs et Services, choisissez coiffure femme, coiffure homme ou coiffure enfant, puis appuyez sur Réserver.</p>
+                    <Link to="/tarifs" className="inline-flex text-sm font-bold text-bordeaux">Ouvrir Tarifs et Services</Link>
+                    {formData.service && <p className="rounded-2xl border border-bordeaux bg-creme px-4 py-3 text-sm font-semibold">{formData.service}</p>}
                     <p className="text-sm font-semibold pt-2">Où ?</p>
                     <div className="grid grid-cols-2 gap-3">
                       <button type="button" onClick={() => setFormData({ ...formData, space: 'Standard' })} className={`border rounded-2xl p-3 text-left ${formData.space === 'Standard' ? 'border-bordeaux bg-creme' : 'border-sable'}`}>
