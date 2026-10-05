@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, Sparkles, Calendar } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -118,20 +118,6 @@ export default function TarifsPage() {
           </motion.div>
         </AnimatePresence>
 
-        <section className="bg-bordeaux text-white rounded-3xl p-8 md:p-12">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest">
-            <Sparkles size={14} />
-            Suite VIP
-          </div>
-          <h2 className="text-3xl font-serif font-bold mt-3">L'option suite, +5 000 FCFA</h2>
-          <p className="text-white/85 text-sm mt-4 max-w-2xl leading-relaxed">
-            La suite s'ajoute à une prestation, ou se réserve avec le Rituel Beauté et le Forfait Mariage. Le choix Standard ou Suite VIP se fait dans le formulaire.
-          </p>
-          <Link to="/#booking" className="mt-6 inline-flex items-center gap-2 bg-white text-charcoal px-6 py-3 rounded-full text-xs font-bold uppercase">
-            <Calendar size={14} />
-            Réserver
-          </Link>
-        </section>
       </main>
 
       <Footer />
