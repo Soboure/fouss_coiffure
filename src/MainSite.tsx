@@ -212,19 +212,39 @@ export default function MainSite() {
       <Navbar />
 
       {/* Hero Section */}
-      <section id="home" className="bg-creme pt-28 pb-16">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
-          <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-bordeaux font-bold">Haie Vive, Cotonou</p>
-            <h1 className="text-4xl md:text-6xl font-serif font-bold text-charcoal mt-3 leading-tight">Le salon, pas une image de stock.</h1>
-            <p className="text-warm-brown mt-4 text-lg">Coiffure, soins et showroom. Choisissez la prestation dans les tarifs, puis envoyez la demande.</p>
-            <a href="#booking" className="inline-flex mt-8 bg-bordeaux text-white px-8 py-4 rounded-full text-xs font-bold uppercase">Prendre un rendez-vous</a>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <img src="/salon/salle.jpg" alt="Salle Fouss Coiffure" className="col-span-2 h-72 w-full object-cover rounded-3xl" />
-            <img src="/salon/mur.jpg" alt="Mur FOUSS Coiffure" className="h-56 w-full object-cover rounded-3xl" />
-            <img src="/salon/fauteuil.jpg" alt="Fauteuil du salon" className="h-56 w-full object-cover rounded-3xl" />
-          </div>
+      <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <video autoPlay loop muted playsInline className="w-full h-full object-cover scale-105">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-background-of-a-golden-wave-3165-large.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-creme via-transparent to-black/35"></div>
+        </div>
+        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16 flex flex-col items-center">
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
+            L'Élégance <br/><span className="italic font-light text-gold-light">au Naturel</span>
+          </motion.h1>
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="text-lg md:text-xl text-creme/90 mb-10 max-w-2xl font-light">
+            Coiffure d'exception, soins spa bien-être et prêt-à-porter haut de gamme. Un espace complet dédié à votre style et votre sérénité.
+          </motion.p>
+          <a href="#booking" className="bg-bordeaux text-white px-10 py-5 rounded-full text-xs font-bold tracking-widest uppercase">Prendre un Rendez-vous</a>
+        </div>
+      </section>
+
+      <section className="bg-creme py-8">
+        <p className="px-6 text-xs uppercase tracking-[0.2em] text-taupe font-bold mb-4">Le salon</p>
+        <div className="flex gap-4 overflow-x-auto px-6 pb-2">
+          {[
+            ['/salon/01-salle.jpg', 'La salle'],
+            ['/salon/02-mur.jpg', "L'enseigne"],
+            ['/salon/03-fauteuils.jpg', 'Les fauteuils'],
+            ['/salon/04-enseigne.jpg', 'Le mur'],
+            ['/salon/05-fauteuil.jpg', 'Un poste'],
+            ['/salon/06-showroom.jpg', 'Le showroom'],
+            ['/salon/07-bac.jpg', 'Le bac'],
+          ].map(([src, alt]) => (
+            <img key={src} src={src} alt={alt} className="h-72 w-auto rounded-3xl shrink-0" />
+          ))}
         </div>
       </section>
 
