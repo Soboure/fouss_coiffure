@@ -3,7 +3,7 @@
 // L'adresse affichée ici doit rester Haie Vive, Cotonou, la même que l'application.
 
 import React from 'react';
-import { Phone, Clock, MapPin } from 'lucide-react';
+import { Clock, MapPin } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
