@@ -12,4 +12,6 @@ export const photosSalon = [
   { fichier: '/salon/05-fauteuil.jpg', texte: 'Un poste' },
   { fichier: '/salon/06-showroom.jpg', texte: 'Le showroom' },
   { fichier: '/salon/07-bac.jpg', texte: 'Le bac' },
+  {fichier: '/salon/08-nouveau.jpg', texte: 'Nouveau poste'},
+  {fichier: '/salon/09-nouveau.jpg', texte: 'Nouveau poste'},
 ];
