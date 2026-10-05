@@ -83,7 +83,6 @@ export default function MainSite() {
       crayon.strokeStyle = '#2B211C';
       crayon.lineWidth = 6;
       crayon.strokeRect(28, 28, 744, 1064);
-
       const logo = await chargerLogo();
       let haut = 80;
       if (logo) {
@@ -99,7 +98,6 @@ export default function MainSite() {
       crayon.fillStyle = '#2B211C';
       crayon.font = 'bold 32px monospace';
       crayon.fillText(ticketCode || 'FOUSS', 400, haut + 42);
-
       const lignes = [
         ['Client', formData.firstName + ' ' + formData.lastName],
         ['Telephone', formData.clientPhone],
@@ -125,17 +123,27 @@ export default function MainSite() {
       crayon.fillText('Haie Vive, Cotonou', 400, 1040);
       crayon.fillText("A presenter a l'accueil", 400, 1072);
 
-      const image = toile.toDataURL('image/png');
-      setImageTicket(image);
+      const fichier = await new Promise<Blob>((resoudre, rejeter) => {
+        toile.toBlob(blob => blob ? resoudre(blob) : rejeter(new Error('image')), 'image/png');
+      });
+      const nom = 'Ticket-FOUSS.png';
+      const image = new File([fichier], nom, { type: 'image/png' });
+      setImageTicket(URL.createObjectURL(fichier));
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [image] })) {
+        await navigator.share({ files: [image], title: 'Ticket FOUSS' });
+        setMessageTicket("Dans le menu, choisissez Enregistrer l'image.");
+        return;
+      }
       const lien = document.createElement('a');
-      lien.href = image;
-      lien.download = 'Ticket-FOUSS-' + (ticketCode || 'reservation') + '.png';
+      lien.href = URL.createObjectURL(fichier);
+      lien.download = nom;
       document.body.appendChild(lien);
       lien.click();
       lien.remove();
-      setMessageTicket('Le fichier Ticket-FOUSS.png doit se trouver dans les telechargements.');
-    } catch {
-      setMessageTicket("Le bouton n'a pas pu lancer le fichier. Utilisez le lien sous le ticket.");
+      setMessageTicket('Le fichier est dans les telechargements.');
+    } catch (erreur) {
+      if (erreur instanceof Error && erreur.name === 'AbortError') return;
+      setMessageTicket("Sur iPhone, appuyez sur Partager le ticket, puis Enregistrer l'image.");
     }
   };
 
@@ -376,9 +384,9 @@ export default function MainSite() {
                   <p className="text-center text-[10px] text-taupe uppercase tracking-wider">Haie Vive, Cotonou · À présenter à l'accueil</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                  <button type="button" onClick={downloadTicket} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">Télécharger le ticket</button>
-                  {imageTicket && <a href={imageTicket} download={"Ticket-FOUSS-" + ticketCode + ".png"} className="sm:col-span-2 text-center text-sm font-bold text-bordeaux underline">Enregistrer le ticket</a>}
+                  <button type="button" onClick={downloadTicket} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">Partager le ticket</button>
                   {messageTicket && <p className="sm:col-span-2 text-xs text-warm-brown">{messageTicket}</p>}
+                  {imageTicket && <img src={imageTicket} alt="Ticket FOUSS" className="sm:col-span-2 rounded-2xl border border-sable" />}
                   <button type="button" onClick={() => { setBookingStatus('idle'); setCurrentStep(1); setTicketCode(''); setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' }); }} className="flex-1 border border-sable py-3 rounded-full text-xs font-semibold">Nouvelle demande</button>
                 </div>
               </div>
