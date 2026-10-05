@@ -55,21 +55,81 @@ export default function MainSite() {
 
   const ticketRef = useRef<HTMLDivElement>(null);
 
+  const [messageTicket, setMessageTicket] = useState('');
+
   const downloadTicket = async () => {
-    if (ticketRef.current) {
-      const element = ticketRef.current;
-      element.style.boxShadow = 'none';
-      const canvas = await html2canvas(element, {
-        scale: 3,
-        backgroundColor: '#FFFFFF',
-        useCORS: true
+    setMessageTicket('');
+    try {
+      const toile = document.createElement('canvas');
+      toile.width = 800;
+      toile.height = 1120;
+      const crayon = toile.getContext('2d');
+      if (!crayon) throw new Error('toile');
+      crayon.fillStyle = '#FFFFFF';
+      crayon.fillRect(0, 0, 800, 1120);
+      crayon.strokeStyle = '#2B211C';
+      crayon.lineWidth = 6;
+      crayon.strokeRect(28, 28, 744, 1064);
+
+      const logo = new Image();
+      logo.src = '/logo-fouss.png';
+      await logo.decode();
+      const largeurLogo = 420;
+      const hauteurLogo = logo.height * (largeurLogo / logo.width);
+      crayon.drawImage(logo, (800 - largeurLogo) / 2, 70, largeurLogo, hauteurLogo);
+
+      crayon.fillStyle = '#7A655E';
+      crayon.font = '22px sans-serif';
+      crayon.textAlign = 'center';
+      crayon.fillText('TICKET DE RESERVATION', 400, 70 + hauteurLogo + 40);
+      crayon.fillStyle = '#2B211C';
+      crayon.font = 'bold 32px monospace';
+      crayon.fillText(ticketCode || 'FOUSS', 400, 70 + hauteurLogo + 84);
+
+      const lignes = [
+        ['Client', `${formData.firstName} ${formData.lastName}`],
+        ['Telephone', formData.clientPhone],
+        ['Prestation', formData.service],
+        ['Prix', prixDemande()],
+        ['Quand', `${formData.date} a ${formData.time}`],
+        ['Espace', formData.space === 'VIP' ? 'Suite VIP' : 'Standard'],
+      ];
+      let y = 70 + hauteurLogo + 140;
+      lignes.forEach(([titre, valeur]) => {
+        crayon.textAlign = 'left';
+        crayon.fillStyle = '#7A655E';
+        crayon.font = '20px sans-serif';
+        crayon.fillText(titre.toUpperCase(), 70, y);
+        crayon.fillStyle = '#2B211C';
+        crayon.font = 'bold 28px sans-serif';
+        crayon.fillText(valeur || '-', 70, y + 34);
+        y += 78;
       });
-      element.style.boxShadow = '';
-      const image = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `Ticket_Fouss_Maison_Beaute_${formData.firstName}_${formData.lastName}.png`;
-      link.click();
+      crayon.fillStyle = '#7A655E';
+      crayon.font = '20px sans-serif';
+      crayon.textAlign = 'center';
+      crayon.fillText('Haie Vive, Cotonou', 400, 1040);
+      crayon.fillText("A presenter a l'accueil", 400, 1072);
+
+      const fichier = await new Promise<Blob>((resoudre, rejeter) => {
+        toile.toBlob(blob => blob ? resoudre(blob) : rejeter(new Error('image')), 'image/png');
+      });
+      const nom = `Ticket-FOUSS-${ticketCode || 'reservation'}.png`;
+      const image = new File([fichier], nom, { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [image] })) {
+        await navigator.share({ files: [image], title: 'Ticket FOUSS' });
+        setMessageTicket('Choisissez Enregistrer dans le menu qui vient de s\'ouvrir.');
+        return;
+      }
+      const lien = document.createElement('a');
+      lien.href = URL.createObjectURL(fichier);
+      lien.download = nom;
+      document.body.appendChild(lien);
+      lien.click();
+      lien.remove();
+      setMessageTicket('Si le fichier ne s\'ouvre pas, appuyez longtemps sur le ticket et choisissez Enregistrer l\'image.');
+    } catch {
+      setMessageTicket('Le telechargement a echoue. Appuyez longtemps sur le ticket, puis Enregistrer l\'image.');
     }
   };
 
@@ -311,6 +371,7 @@ export default function MainSite() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
                   <button type="button" onClick={downloadTicket} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">Télécharger le ticket</button>
+                  {messageTicket && <p className="sm:col-span-2 text-xs text-warm-brown">{messageTicket}</p>}
                   <button type="button" onClick={() => { setBookingStatus('idle'); setCurrentStep(1); setTicketCode(''); setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' }); }} className="flex-1 border border-sable py-3 rounded-full text-xs font-semibold">Nouvelle demande</button>
                 </div>
               </div>
