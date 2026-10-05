@@ -401,7 +401,7 @@ export default function MainSite() {
                   <div className="space-y-4">
                     <p className="text-sm font-semibold">Prestation</p>
                     <p className="text-sm text-warm-brown">Allez dans Tarifs et Services, choisissez coiffure femme, coiffure homme ou coiffure enfant, puis appuyez sur Réserver.</p>
-                    <Link to="/tarifs" className="inline-flex text-sm font-bold text-bordeaux">Ouvrir Tarifs et Services</Link>
+                    <Link to="/tarifs" className="inline-flex items-center justify-center bg-bordeaux text-white px-6 py-3 rounded-full text-sm font-bold">Choisir dans Tarifs et Services</Link>
                     {formData.service && <p className="rounded-2xl border border-bordeaux bg-creme px-4 py-3 text-sm font-semibold">{formData.service}</p>}
                     <p className="text-sm font-semibold pt-2">Où ?</p>
                     <div className="grid grid-cols-2 gap-3">
