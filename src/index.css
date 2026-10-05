@@ -86,3 +86,18 @@ html {
 }
 
 
+
+/* Bande des photos du salon. La liste est dans src/data/photosSalon.ts */
+.bande-salon {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  animation: defilement-salon 40s linear infinite;
+}
+.bande-salon:hover {
+  animation-play-state: paused;
+}
+@keyframes defilement-salon {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}

@@ -12,6 +12,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 
 import { allServicesList } from './data/services';
+import { photosSalon } from './data/photosSalon';
 
 const pillars = [
   {
@@ -231,19 +232,11 @@ export default function MainSite() {
         </div>
       </section>
 
-      <section className="bg-creme py-8">
+      <section className="bg-creme py-8 overflow-hidden">
         <p className="px-6 text-xs uppercase tracking-[0.2em] text-taupe font-bold mb-4">Le salon</p>
-        <div className="flex gap-4 overflow-x-auto px-6 pb-2">
-          {[
-            ['/salon/01-salle.jpg', 'La salle'],
-            ['/salon/02-mur.jpg', "L'enseigne"],
-            ['/salon/03-fauteuils.jpg', 'Les fauteuils'],
-            ['/salon/04-enseigne.jpg', 'Le mur'],
-            ['/salon/05-fauteuil.jpg', 'Un poste'],
-            ['/salon/06-showroom.jpg', 'Le showroom'],
-            ['/salon/07-bac.jpg', 'Le bac'],
-          ].map(([src, alt]) => (
-            <img key={src} src={src} alt={alt} className="h-72 w-auto rounded-3xl shrink-0" />
+        <div className="bande-salon">
+          {[...photosSalon, ...photosSalon].map((photo, index) => (
+            <img key={photo.fichier + index} src={photo.fichier} alt={photo.texte} className="h-72 w-auto rounded-3xl" />
           ))}
         </div>
       </section>
