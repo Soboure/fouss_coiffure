@@ -1,5 +1,5 @@
 // Rôle de ce fichier : la page des prix.
-// Coiffure se divise en Femme, Homme et Enfant. Enfant n'a pas encore de prix.
+// Coiffure se divise en Femme, Homme et Enfant. Femme, Homme et Enfant lisent la liste du guide. Les prix manquants affichent Prix au salon.
 // Les montants viennent de src/data/services.ts. On ne les réécrit pas dans cette page.
 // Réserver renvoie au formulaire avec la prestation déjà choisie.
 
@@ -20,12 +20,12 @@ const onglets = [
 
 const publics = ['Femme', 'Homme', 'Enfant'] as const;
 
-const coiffureFemme = ['tresses', 'tissage', 'nappy'];
-const coiffureHomme = ['degrade', 'barbe'];
+const coiffureFemme = ['tresses', 'tissage', 'nappy', 'nattes-femme', 'ghana', 'box', 'knotless', 'goddess', 'senegalese', 'marley', 'passion', 'perruque', 'faux-locks', 'taper-femme', 'teint'];
+const coiffureHomme = ['degrade', 'barbe', 'taper', 'degrade-blanc', 'contours', 'waves', 'sponge', 'boule-zero', 'nattes-homme', 'twists-homme', 'dreadlocks', 'afro'];
+const coiffureEnfant = ['perles', 'fil', 'pompons', 'mini-vanilles', 'degrade-enfant', 'motifs'];
 
 function prestationsCoiffure(publicCible: (typeof publics)[number]): Service[] {
-  if (publicCible === 'Enfant') return [];
-  const ids = publicCible === 'Femme' ? coiffureFemme : coiffureHomme;
+  const ids = publicCible === 'Femme' ? coiffureFemme : publicCible === 'Homme' ? coiffureHomme : coiffureEnfant;
   return serviceCategories.coiffure.filter((service) => ids.includes(service.id));
 }
 
