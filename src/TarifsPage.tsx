@@ -5,7 +5,6 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -90,29 +89,25 @@ export default function TarifsPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
+            className="space-y-2 mb-16"
           >
             {cartes.length === 0 ? (
-              <p className="text-warm-brown md:col-span-3">Les tarifs de cette section seront ajoutés ici.</p>
+              <p className="text-warm-brown">Les tarifs de cette section seront ajoutés ici.</p>
             ) : cartes.map((service) => (
-              <article key={service.id} className="bg-white p-6 rounded-2xl border border-sable flex flex-col justify-between">
-                <div>
-                  <h3 className="text-xl font-serif font-bold">{service.name}</h3>
-                  <p className="text-warm-brown text-sm leading-relaxed mt-3">{service.desc}</p>
+              <article key={service.id} className="bg-white border border-sable rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="font-semibold">{service.name}</h3>
+                    <p className="text-bordeaux text-sm font-bold shrink-0">{service.price}</p>
+                  </div>
+                  <p className="text-xs text-taupe mt-1">{service.duration} · {service.desc}</p>
                 </div>
-                <div className="mt-6">
-                  <p className="text-bordeaux text-2xl font-serif font-bold">{service.price}</p>
-                  <p className="text-xs text-taupe mt-2 flex items-center gap-1.5">
-                    <Clock size={14} />
-                    {service.duration}
-                  </p>
-                  <Link
-                    to={`/?service=${encodeURIComponent(service.name)}#booking`}
-                    className="mt-5 inline-flex items-center justify-center bg-bordeaux text-white px-5 py-3 rounded-full text-xs font-bold uppercase tracking-wider"
-                  >
-                    Réserver
-                  </Link>
-                </div>
+                <Link
+                  to={`/?service=${encodeURIComponent(service.name)}#booking`}
+                  className="shrink-0 inline-flex items-center justify-center bg-bordeaux text-white px-4 py-2 rounded-full text-xs font-bold"
+                >
+                  Réserver
+                </Link>
               </article>
             ))}
           </motion.div>
