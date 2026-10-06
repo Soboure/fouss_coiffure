@@ -41,8 +41,8 @@ export default function TarifsPage() {
     <div className="min-h-screen bg-creme text-charcoal font-sans">
       <Navbar />
 
-      <section className="relative py-20 bg-charcoal text-white overflow-hidden mt-[73px]">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="relative py-16 sm:py-20 bg-charcoal text-white overflow-hidden mt-[73px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <span className="text-gold-light text-xs font-bold tracking-widest uppercase">Notre catalogue</span>
           <h1 className="text-4xl md:text-5xl font-serif font-bold mt-2">Tarifs & Prestations</h1>
           <p className="text-creme/80 text-sm md:text-base mt-4 max-w-xl leading-relaxed font-light">

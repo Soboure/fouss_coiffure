@@ -213,7 +213,7 @@ export default function MainSite() {
       <Navbar />
 
       {/* Hero Section */}
-      <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section id="home" className="relative min-h-[100svh] flex items-center justify-center overflow-hidden px-4">
         <div className="absolute inset-0 z-0">
           <video autoPlay loop muted playsInline className="w-full h-full object-cover scale-105">
             <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-background-of-a-golden-wave-3165-large.mp4" type="video/mp4" />
@@ -222,13 +222,13 @@ export default function MainSite() {
           <div className="absolute inset-0 bg-gradient-to-t from-creme via-transparent to-black/35"></div>
         </div>
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16 flex flex-col items-center">
-          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-4xl sm:text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
             L'Élégance <br/><span className="italic font-light text-gold-light">au Naturel</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="text-lg md:text-xl text-creme/90 mb-10 max-w-2xl font-light">
             Coiffure d'exception, soins spa bien-être et prêt-à-porter haut de gamme. Un espace complet dédié à votre style et votre sérénité.
           </motion.p>
-          <a href="#booking" className="bg-bordeaux text-white px-10 py-5 rounded-full text-xs font-bold tracking-widest uppercase">Prendre un Rendez-vous</a>
+          <a href="#booking" className="bg-bordeaux text-white px-8 py-4 rounded-full text-sm font-bold uppercase">Prendre un Rendez-vous</a>
         </div>
       </section>
 
@@ -236,7 +236,7 @@ export default function MainSite() {
         <p className="px-6 text-xs uppercase tracking-[0.2em] text-taupe font-bold mb-4">Le salon</p>
         <div className="bande-salon">
           {[...photosSalon, ...photosSalon].map((photo, index) => (
-            <img key={photo.fichier + index} src={photo.fichier} alt={photo.texte} className="h-72 w-auto rounded-3xl" />
+            <img key={photo.fichier + index} src={photo.fichier} alt={photo.texte} className="h-56 sm:h-72 w-auto max-w-none rounded-3xl" />
           ))}
         </div>
       </section>
@@ -369,7 +369,7 @@ export default function MainSite() {
               </div>
             ) : (
               <form onSubmit={handleBook} className="space-y-6">
-                <div className="grid grid-cols-3 gap-2 text-center text-xs font-semibold">
+                <div className="grid grid-cols-3 gap-2 text-center text-[11px] sm:text-xs font-semibold">
                   {['1. Prestation', '2. Date', '3. Coordonnées'].map((label, index) => (
                     <div key={label} className={`py-2 rounded-full ${currentStep === index + 1 ? 'bg-bordeaux text-white' : 'bg-creme text-taupe'}`}>{label}</div>
                   ))}

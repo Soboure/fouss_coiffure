@@ -37,7 +37,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Logo */}
         <Link to="/#home" onClick={handleLinkClick} className="flex items-center cursor-pointer">
-          <img src="/logo-fouss.png" alt="Fouss Coiffure" className="h-12 w-auto" />
+          <img src="/logo-fouss.png" alt="Fouss Coiffure" className="h-10 sm:h-12 w-auto" />
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -67,7 +67,7 @@ export default function Navbar() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden text-charcoal hover:text-gold-dark transition-colors p-2"
+          className="md:hidden text-charcoal p-3 min-h-11 min-w-11"
           aria-label="Toggle menu"
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
