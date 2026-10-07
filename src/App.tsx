@@ -1,7 +1,5 @@
-// Rôle de ce fichier : les routes, c'est-à-dire quelle adresse ouvre quelle page.
-// / accueil, /tarifs tarifs, /galerie galerie, /admin tableau du salon.
-// Les anciennes adresses /galerie/femmes, /hommes et /enfants restent pour les liens déjà partagés.
-// Une nouvelle page se déclare ici, puis on ajoute son fichier dans src.
+// Routes : quelle adresse ouvre quelle page.
+// /app est l'écran PWA (maquette mobile). Le reste du site ne change pas.
 
 import React, { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
@@ -12,14 +10,13 @@ import Galerie from './Galerie';
 import GalerieFemme from './GalerieFemme';
 import GalerieHomme from './GalerieHomme';
 import GalerieEnfant from './GalerieEnfant';
+import AppShell from './pwa/AppShell';
 
-// Helper component to handle smooth scroll on hash change or page change
 function ScrollToAnchor() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
     if (hash) {
-      // Small timeout to ensure DOM elements are fully loaded
       const timer = setTimeout(() => {
         const id = hash.replace('#', '');
         const element = document.getElementById(id);
@@ -42,6 +39,7 @@ export default function App() {
       <ScrollToAnchor />
       <Routes>
         <Route path="/" element={<MainSite />} />
+        <Route path="/app" element={<AppShell />} />
         <Route path="/tarifs" element={<TarifsPage />} />
         <Route path="/galerie" element={<Galerie />} />
         <Route path="/galerie/femmes" element={<GalerieFemme />} />
@@ -53,5 +51,3 @@ export default function App() {
     </>
   );
 }
-
-

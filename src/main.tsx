@@ -1,12 +1,12 @@
-// Rôle de ce fichier : point d'entrée du site.
-// Il affiche App dans la page, avec le routeur.
-// On ne met pas les pages ici. Si le site ne s'ouvre pas du tout, on regarde ici en premier.
+// Point d'entrée du site. Affiche App dans la page, avec le routeur.
+// registerServiceWorker branche le PWA : sans cette ligne, le site n'est pas installable.
 
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './index.css';
+import { registerServiceWorker } from './pwa/register';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -15,3 +15,5 @@ createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </StrictMode>,
 );
+
+registerServiceWorker();
