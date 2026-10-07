@@ -1,9 +1,10 @@
 // Rôle de ce fichier : la galerie.
 // Barre Coiffure, Soins, Style. Sous Coiffure : Enfant, Homme, Femme.
 // Style, c'est le showroom en photo. Les images sont dans public/galerie.
-// Un toucher ouvre la photo en grand. Un autre toucher passe à la suivante.
+// Sous chaque nom : Voir ouvre la photo en grand, Réserver envoie le nom au formulaire d'accueil.
 
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './Navbar';
@@ -73,9 +74,6 @@ export default function Galerie() {
           ? photosFemme
           : photosEnfant;
 
-  const grande = photos[0];
-  const suite = photos.slice(1);
-
   useEffect(() => {
     const fermer = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOuverte(null);
@@ -121,10 +119,25 @@ export default function Galerie() {
         <p className="text-sm text-taupe mb-4">{photos.length} photos</p>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {photos.map((photo, index) => (
-            <button key={photo.src} onClick={() => setOuverte(index)} className="text-left">
-              <img src={photo.src} alt={photo.title} className="w-full h-40 md:h-48 object-cover rounded-2xl bg-white" />
-              <p className="text-xs font-semibold mt-2">{photo.title}</p>
-            </button>
+            <article key={photo.src} className="bg-white border border-sable rounded-2xl p-2">
+              <img src={photo.src} alt={photo.title} className="w-full h-40 md:h-48 object-cover rounded-xl bg-creme" />
+              <p className="text-xs font-semibold mt-2 px-1">{photo.title}</p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOuverte(index)}
+                  className="rounded-full border border-sable py-2 text-[11px] font-semibold"
+                >
+                  Voir
+                </button>
+                <Link
+                  to={`/?service=${encodeURIComponent(photo.title)}#booking`}
+                  className="rounded-full bg-bordeaux text-white py-2 text-[11px] font-semibold text-center"
+                >
+                  Réserver
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
       </main>
@@ -135,7 +148,7 @@ export default function Galerie() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4 gap-4"
             onClick={() => setOuverte(null)}
           >
             <button className="absolute top-6 right-6 text-white" aria-label="Fermer">
@@ -144,12 +157,18 @@ export default function Galerie() {
             <img
               src={photos[ouverte].src}
               alt={photos[ouverte].title}
-              className="max-h-[85vh] max-w-full object-contain"
-              onClick={(e) => {
-                e.stopPropagation();
-                setOuverte((ouverte + 1) % photos.length);
-              }}
+              className="max-h-[75vh] max-w-full object-contain"
+              onClick={(e) => e.stopPropagation()}
             />
+            <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
+              <p className="text-white text-sm self-center">{photos[ouverte].title}</p>
+              <Link
+                to={`/?service=${encodeURIComponent(photos[ouverte].title)}#booking`}
+                className="rounded-full bg-white text-charcoal px-4 py-2 text-xs font-semibold"
+              >
+                Réserver
+              </Link>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
