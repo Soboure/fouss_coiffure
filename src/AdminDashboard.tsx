@@ -5,7 +5,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, LogOut, Search, ShieldAlert } from 'lucide-react';
-import AdminAvis from './AdminAvis';
 
 type Reservation = {
   id: number;
@@ -157,7 +156,6 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-6xl mx-auto p-6">
-        <AdminAvis token={token} />
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[['Total', reservations.length], ['En attente', pending], ['Confirmées', confirmed]].map(([label, n]) => (
             <div key={String(label)} className="bg-white border border-sable rounded-2xl p-4">
