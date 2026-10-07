@@ -1,5 +1,5 @@
 // Routes : quelle adresse ouvre quelle page.
-// /app est l'écran PWA (maquette mobile). Le reste du site ne change pas.
+// /app est l'ecran PWA. InstallPrompt affiche la banniere d'installation sur les pages client.
 
 import React, { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
@@ -11,6 +11,7 @@ import GalerieFemme from './GalerieFemme';
 import GalerieHomme from './GalerieHomme';
 import GalerieEnfant from './GalerieEnfant';
 import AppShell from './pwa/AppShell';
+import InstallPrompt from './pwa/InstallPrompt';
 
 function ScrollToAnchor() {
   const { pathname, hash } = useLocation();
@@ -37,6 +38,7 @@ export default function App() {
   return (
     <>
       <ScrollToAnchor />
+      <InstallPrompt />
       <Routes>
         <Route path="/" element={<MainSite />} />
         <Route path="/app" element={<AppShell />} />
