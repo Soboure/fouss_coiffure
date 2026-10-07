@@ -1,19 +1,21 @@
-// Rôle de ce fichier : le pied de page, commun aux pages publiques.
-// Il affiche l'adresse. Il ne gère pas les réservations.
-// L'adresse affichée ici doit rester Haie Vive, Cotonou, la même que l'application.
+// Pied de page des pages publiques.
+// Sur l'accueil, les avis sont affichés juste avant ce pied de page.
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Clock, MapPin } from 'lucide-react';
+import Avis from './Avis';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const accueil = useLocation().pathname === '/';
 
   return (
     <>
+      {accueil && <Avis />}
       <footer className="bg-charcoal text-white pt-16 pb-12 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 text-center md:text-left">
-            {/* Left Column: Brand */}
             <div className="flex flex-col items-center md:items-start justify-center md:justify-start">
               <div className="flex flex-col items-center md:items-start mb-4">
                 <span className="font-display text-3xl font-black tracking-tight text-white leading-none">
@@ -28,7 +30,6 @@ export default function Footer() {
               </p>
             </div>
 
-            {/* Middle Column: Schedule */}
             <div className="flex flex-col items-center justify-center">
               <h4 className="text-gold-light font-serif text-lg font-semibold mb-4 flex items-center gap-2 justify-center">
                 <Clock size={16} />
@@ -42,7 +43,6 @@ export default function Footer() {
               </p>
             </div>
 
-            {/* Right Column: Contact & Address */}
             <div className="flex flex-col items-center md:items-end justify-center md:justify-start">
               <h4 className="text-gold-light font-serif text-lg font-semibold mb-4 flex items-center gap-2 md:flex-row-reverse justify-center md:justify-start">
                 <MapPin size={16} />
@@ -60,7 +60,6 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-
     </>
   );
 }
