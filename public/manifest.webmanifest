@@ -1,6 +1,3 @@
-/* Le navigateur lit ce fichier pour installer le site.
-   Il doit rester dans public/ : Vite le copie à la racine.
-   start_url /app : l'icône du téléphone ouvre l'écran appli, pas la page vitrine. */
 {
   "name": "Fouss Coiffure",
   "short_name": "Fouss",
