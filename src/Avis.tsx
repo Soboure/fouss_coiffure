@@ -79,9 +79,6 @@ export default function Avis() {
               <p className="mt-3 text-sm leading-relaxed text-charcoal">« {item.texte} »</p>
             </article>
           ))}
-          {avis.length === 0 && (
-            <p className="text-sm text-taupe md:col-span-2 lg:col-span-3">Les premiers avis publiés apparaîtront ici.</p>
-          )}
         </div>
 
         {formulaireOuvert && (
