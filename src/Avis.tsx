@@ -65,8 +65,7 @@ export default function Avis() {
     <section id="avis" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
-          <span className="text-gold-dark text-xs font-bold tracking-widest uppercase">Avis clients</span>
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-charcoal mt-2">Ils sont passés au salon</h2>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-charcoal">Avis clients</h2>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -78,8 +77,6 @@ export default function Avis() {
                 ))}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-charcoal">« {item.texte} »</p>
-              <p className="mt-4 text-sm font-semibold">{item.nom}</p>
-              <p className="text-xs text-taupe">{item.prestation}</p>
             </article>
           ))}
           {avis.length === 0 && (
