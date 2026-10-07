@@ -1,7 +1,8 @@
 // Rôle de ce fichier : la galerie.
 // Barre Coiffure, Soins, Style. Sous Coiffure : Enfant, Homme, Femme.
-// Style, c'est le showroom en photo. Les images sont dans public/galerie.
-// Sous chaque nom : Voir ouvre la photo en grand, Réserver envoie le nom au formulaire d'accueil.
+// Chaque photo a un nom et un prix, affichés côte à côte.
+// Le prix reprend le catalogue quand la prestation existe. Sinon : Prix au salon.
+// Voir ouvre la photo. Réserver envoie le nom au formulaire d'accueil.
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -12,6 +13,7 @@ import Footer from './Footer';
 
 type Famille = 'coiffure' | 'soins' | 'style';
 type PublicCoiffure = 'enfant' | 'homme' | 'femme';
+type Photo = { src: string; title: string; price: string };
 
 const familles = [
   { id: 'coiffure', label: 'Coiffure' },
@@ -19,44 +21,44 @@ const familles = [
   { id: 'style', label: 'Style' },
 ] as const;
 
-const photosEnfant = [
-  { src: '/galerie/enfant1.jpg', title: 'Tresses Fillette Créatives' },
-  { src: '/galerie/enfant2.jpg', title: 'Coupe Petit Gentleman' },
-  { src: '/galerie/enfant3.jpg', title: 'Tresses Protectrices Enfant' },
-  { src: '/galerie/enfant4.jpg', title: 'Coupe Garçon Moderne' },
-  { src: '/galerie/enfant5.jpg', title: 'Nattes Fillette Simples' },
-  { src: '/galerie/enfant6.jpg', title: 'Soin Démêlant sans Douleur' },
+const photosEnfant: Photo[] = [
+  { src: '/galerie/enfant1.jpg', title: 'Tresses Fillette Créatives', price: 'Prix au salon' },
+  { src: '/galerie/enfant2.jpg', title: 'Coupe Petit Gentleman', price: 'Prix au salon' },
+  { src: '/galerie/enfant3.jpg', title: 'Tresses Protectrices Enfant', price: 'Prix au salon' },
+  { src: '/galerie/enfant4.jpg', title: 'Coupe Garçon Moderne', price: 'Prix au salon' },
+  { src: '/galerie/enfant5.jpg', title: 'Nattes Fillette Simples', price: 'Prix au salon' },
+  { src: '/galerie/enfant6.jpg', title: 'Soin Démêlant sans Douleur', price: 'Prix au salon' },
 ];
 
-const photosHomme = [
-  { src: '/galerie/homme1.jpg', title: 'Dégradé Vagues' },
-  { src: '/galerie/homme2.jpg', title: 'Forfait Barbe & Coupe' },
-  { src: '/galerie/homme3.jpg', title: 'Dégradé à Blanc' },
-  { src: '/galerie/homme4.jpg', title: 'Contours Dessinés' },
-  { src: '/galerie/homme5.jpg', title: 'Taille de Barbe Traditionnelle' },
-  { src: '/galerie/homme6.jpg', title: 'Afro Court Dégradé' },
-  { src: '/galerie/homme7.jpg', title: 'Contours & Coloration Barbe' },
-  { src: '/galerie/homme8.jpg', title: 'Coupe Slick Back Dégradé' },
-  { src: '/galerie/homme9.jpg', title: 'Prestation Master Barbier' },
+const photosHomme: Photo[] = [
+  { src: '/galerie/homme1.jpg', title: 'Dégradé Vagues', price: '3 000 FCFA' },
+  { src: '/galerie/homme2.jpg', title: 'Forfait Barbe & Coupe', price: '5 000 FCFA' },
+  { src: '/galerie/homme3.jpg', title: 'Dégradé à Blanc', price: 'Prix au salon' },
+  { src: '/galerie/homme4.jpg', title: 'Contours Dessinés', price: 'Prix au salon' },
+  { src: '/galerie/homme5.jpg', title: 'Taille de Barbe Traditionnelle', price: '2 000 FCFA' },
+  { src: '/galerie/homme6.jpg', title: 'Afro Court Dégradé', price: '3 000 FCFA' },
+  { src: '/galerie/homme7.jpg', title: 'Contours & Coloration Barbe', price: 'Prix au salon' },
+  { src: '/galerie/homme8.jpg', title: 'Coupe Slick Back Dégradé', price: '3 000 FCFA' },
+  { src: '/galerie/homme9.jpg', title: 'Prestation Master Barbier', price: 'Prix au salon' },
 ];
 
-const photosFemme = [
-  { src: '/galerie/femme1.jpg', title: 'Tresses Artistiques' },
-  { src: '/galerie/femme2.jpg', title: 'Coiffure de Cérémonie' },
-  { src: '/galerie/femme3.jpg', title: 'Soin Protecteur & Nappy' },
-  { src: '/galerie/femme4.jpg', title: 'Tresses & Nattes Collées' },
+const photosFemme: Photo[] = [
+  { src: '/galerie/femme1.jpg', title: 'Tresses Artistiques', price: '15 000 FCFA' },
+  { src: '/galerie/femme2.jpg', title: 'Coiffure de Cérémonie', price: 'Prix au salon' },
+  { src: '/galerie/femme3.jpg', title: 'Soin Protecteur & Nappy', price: '10 000 FCFA' },
+  { src: '/galerie/femme4.jpg', title: 'Tresses & Nattes Collées', price: 'Prix au salon' },
 ];
 
-const photosSoins = [
-  { src: '/galerie/Soin1.jpg', title: 'Massage aux Pierres Chaudes' },
-  { src: '/galerie/Soin2.jpg', title: 'Soin Visage Hydratant' },
-  { src: '/galerie/Soin3.jpg', title: 'Rituel Capillaire & Huiles' },
-  { src: '/galerie/Soin4.jpg', title: 'Aromathérapie Capillaire' },
+const photosSoins: Photo[] = [
+  { src: '/galerie/Soin1.jpg', title: 'Massage aux Pierres Chaudes', price: '25 000 FCFA' },
+  { src: '/galerie/Soin2.jpg', title: 'Soin Visage Hydratant', price: '15 000 FCFA' },
+  { src: '/galerie/Soin3.jpg', title: 'Rituel Capillaire & Huiles', price: '10 000 FCFA' },
+  { src: '/galerie/Soin4.jpg', title: 'Aromathérapie Capillaire', price: 'Prix au salon' },
 ];
 
-const photosStyle = [
-  { src: '/galerie/Showroom1.jpg', title: 'Le Showroom' },
-  { src: '/galerie/Showroom2.jpg', title: 'Robes de Créateurs' },
+const photosStyle: Photo[] = [
+  { src: '/galerie/Showroom1.jpg', title: 'Le Showroom', price: 'Entrée libre' },
+  { src: '/galerie/Showroom2.jpg', title: 'Robes de Créateurs', price: 'Prix au salon' },
 ];
 
 export default function Galerie() {
@@ -121,7 +123,10 @@ export default function Galerie() {
           {photos.map((photo, index) => (
             <article key={photo.src} className="bg-white border border-sable rounded-2xl p-2">
               <img src={photo.src} alt={photo.title} className="w-full h-40 md:h-48 object-cover rounded-xl bg-creme" />
-              <p className="text-xs font-semibold mt-2 px-1">{photo.title}</p>
+              <div className="mt-2 px-1 flex items-start justify-between gap-2">
+                <p className="text-xs font-semibold">{photo.title}</p>
+                <p className="text-xs font-bold text-bordeaux shrink-0">{photo.price}</p>
+              </div>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -160,8 +165,9 @@ export default function Galerie() {
               className="max-h-[75vh] max-w-full object-contain"
               onClick={(e) => e.stopPropagation()}
             />
-            <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
-              <p className="text-white text-sm self-center">{photos[ouverte].title}</p>
+            <div className="flex gap-3 items-center" onClick={(e) => e.stopPropagation()}>
+              <p className="text-white text-sm">{photos[ouverte].title}</p>
+              <p className="text-white text-sm font-semibold">{photos[ouverte].price}</p>
               <Link
                 to={`/?service=${encodeURIComponent(photos[ouverte].title)}#booking`}
                 className="rounded-full bg-white text-charcoal px-4 py-2 text-xs font-semibold"
