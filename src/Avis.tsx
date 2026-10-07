@@ -1,6 +1,5 @@
 // Avis clients sur l'accueil.
-// Les cartes viennent de GET /api/avis, seulement les avis publiés.
-// Le formulaire n'est pas affiché en permanence : le bouton flottant envoie vers #donner-avis.
+// La photo est facultative. Elle est réduite dans le navigateur avant l'envoi.
 
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -12,7 +11,32 @@ type AvisClient = {
   prestation: string;
   note: number;
   texte: string;
+  photo?: string;
 };
+
+function reduirePhoto(fichier: File) {
+  return new Promise<string>((resolve, reject) => {
+    const image = new Image();
+    const url = URL.createObjectURL(fichier);
+    image.onload = () => {
+      const max = 900;
+      const ratio = Math.min(1, max / Math.max(image.width, image.height));
+      const toile = document.createElement('canvas');
+      toile.width = Math.round(image.width * ratio);
+      toile.height = Math.round(image.height * ratio);
+      const crayon = toile.getContext('2d');
+      if (!crayon) {
+        reject(new Error('Photo illisible'));
+        return;
+      }
+      crayon.drawImage(image, 0, 0, toile.width, toile.height);
+      URL.revokeObjectURL(url);
+      resolve(toile.toDataURL('image/jpeg', 0.72));
+    };
+    image.onerror = () => reject(new Error('Photo illisible'));
+    image.src = url;
+  });
+}
 
 export default function Avis() {
   const { hash } = useLocation();
@@ -22,6 +46,7 @@ export default function Avis() {
   const [prestation, setPrestation] = useState('');
   const [note, setNote] = useState(5);
   const [texte, setTexte] = useState('');
+  const [photo, setPhoto] = useState('');
   const [message, setMessage] = useState('');
   const [envoi, setEnvoi] = useState(false);
 
@@ -37,6 +62,21 @@ export default function Avis() {
     document.getElementById('donner-avis')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [formulaireOuvert]);
 
+  async function choisirPhoto(fichier?: File) {
+    if (!fichier) {
+      setPhoto('');
+      return;
+    }
+    const reduite = await reduirePhoto(fichier);
+    if (reduite.length > 500000) {
+      setMessage('Photo trop lourde. Choisis une image plus petite.');
+      setPhoto('');
+      return;
+    }
+    setMessage('');
+    setPhoto(reduite);
+  }
+
   async function envoyer(e: React.FormEvent) {
     e.preventDefault();
     setEnvoi(true);
@@ -45,13 +85,14 @@ export default function Avis() {
       const res = await fetch('/api/avis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nom, prestation, note, texte }),
+        body: JSON.stringify({ nom, prestation, note, texte, photo }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Envoi impossible');
       setNom('');
       setPrestation('');
       setTexte('');
+      setPhoto('');
       setNote(5);
       setMessage('Merci. Le salon lit l\'avis avant de l\'afficher.');
     } catch (err: any) {
@@ -71,6 +112,7 @@ export default function Avis() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {avis.map((item) => (
             <article key={item.id} className="bg-creme border border-sable rounded-3xl p-5">
+              {item.photo && <img src={item.photo} alt="" className="w-full h-44 object-cover rounded-2xl mb-3" />}
               <div className="flex gap-1 text-bordeaux" aria-label={`${item.note} sur 5`}>
                 {Array.from({ length: 5 }, (_, i) => (
                   <Star key={i} size={14} fill={i < item.note ? 'currentColor' : 'none'} />
@@ -93,6 +135,11 @@ export default function Avis() {
               </select>
             </label>
             <textarea value={texte} onChange={(e) => setTexte(e.target.value)} required maxLength={600} placeholder="Votre avis" className="w-full border border-sable rounded-xl px-4 py-3 text-sm bg-white min-h-28" />
+            <label className="block text-xs text-taupe">
+              Photo de la coiffure, facultative
+              <input type="file" accept="image/*" onChange={(e) => choisirPhoto(e.target.files?.[0])} className="mt-1 block w-full text-sm" />
+            </label>
+            {photo && <img src={photo} alt="Aperçu" className="w-full h-40 object-cover rounded-2xl" />}
             <button disabled={envoi} className="bg-bordeaux text-white rounded-full px-5 py-3 text-sm font-semibold">
               {envoi ? 'Envoi...' : 'Envoyer mon avis'}
             </button>
@@ -102,10 +149,7 @@ export default function Avis() {
       </div>
 
       {!formulaireOuvert && (
-        <Link
-          to="/#donner-avis"
-          className="fixed bottom-6 right-6 z-40 rounded-full bg-bordeaux text-white px-5 py-3 text-sm font-semibold shadow-lg"
-        >
+        <Link to="/#donner-avis" className="fixed bottom-6 right-6 z-40 rounded-full bg-bordeaux text-white px-5 py-3 text-sm font-semibold shadow-lg">
           Donner votre avis
         </Link>
       )}

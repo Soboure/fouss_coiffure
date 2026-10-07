@@ -9,6 +9,7 @@ type AvisAdmin = {
   prestation: string;
   note: number;
   texte: string;
+  photo?: string;
   status?: string;
 };
 
@@ -36,7 +37,7 @@ export default function AdminAvis({ token }: { token: string }) {
   return (
     <section className="bg-white border border-sable rounded-3xl p-5 mb-6">
       <h2 className="font-serif text-2xl">Avis à modérer</h2>
-      <p className="text-xs text-taupe mt-1 mb-4">Un avis envoyé par le site reste caché tant qu’il n’est pas publié.</p>
+      <p className="text-xs text-taupe mt-1 mb-4">Un avis envoyé par le site reste caché tant qu'il n'est pas publié.</p>
       <div className="space-y-3">
         {avis.map((item) => (
           <article key={item.id} className="border border-sable rounded-2xl p-4">
@@ -44,6 +45,7 @@ export default function AdminAvis({ token }: { token: string }) {
               <p className="font-semibold">{item.nom} · {item.prestation} · {item.note}/5</p>
               <span className="text-xs text-taupe">{item.status || 'En attente'}</span>
             </div>
+            {item.photo && <img src={item.photo} alt="" className="mt-3 w-28 h-28 object-cover rounded-xl" />}
             <p className="text-sm mt-2">{item.texte}</p>
             <button
               onClick={() => changer(item.id, item.status === 'Publié' ? 'En attente' : 'Publié')}

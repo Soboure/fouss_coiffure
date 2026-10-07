@@ -1,7 +1,6 @@
 // Avis clients.
 // Le public envoie un avis. Il n'apparaît qu'après publication dans l'admin.
-// GET /api/avis : avis publiés. POST /api/avis : nouvel avis en attente.
-// GET /api/avis/moderation et PATCH exigent X-Admin-Token.
+// photo est facultative : une image JPEG déjà réduite, ou vide.
 
 import express from 'express';
 import { sql } from '@vercel/postgres';
@@ -23,10 +22,12 @@ async function initAvis() {
         prestation TEXT,
         note INTEGER,
         texte TEXT,
+        photo TEXT,
         status TEXT DEFAULT 'En attente',
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    try { db.exec('ALTER TABLE avis ADD COLUMN photo TEXT'); } catch (e) {}
   } else {
     await sql`
       CREATE TABLE IF NOT EXISTS avis (
@@ -35,10 +36,12 @@ async function initAvis() {
         prestation VARCHAR(120),
         note INTEGER,
         texte VARCHAR(600),
+        photo TEXT,
         status VARCHAR(32) DEFAULT 'En attente',
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
+    await sql`ALTER TABLE avis ADD COLUMN IF NOT EXISTS photo TEXT`;
   }
   ready = true;
 }
@@ -47,14 +50,22 @@ function propre(valeur: unknown, max: number) {
   return String(valeur || '').trim().slice(0, max);
 }
 
+function photoValide(valeur: unknown) {
+  const photo = String(valeur || '');
+  if (!photo) return '';
+  if (!photo.startsWith('data:image/jpeg;base64,')) return '';
+  if (photo.length > 500000) return '';
+  return photo;
+}
+
 router.get('/api/avis', async (_req, res) => {
   try {
     await initAvis();
     if (usePostgres) {
-      const { rows } = await sql`SELECT id, nom, prestation, note, texte FROM avis WHERE status = 'Publié' ORDER BY id DESC`;
+      const { rows } = await sql`SELECT id, nom, prestation, note, texte, photo FROM avis WHERE status = 'Publié' ORDER BY id DESC`;
       return res.json(rows);
     }
-    return res.json(db.prepare(`SELECT id, nom, prestation, note, texte FROM avis WHERE status = 'Publié' ORDER BY id DESC`).all());
+    return res.json(db.prepare(`SELECT id, nom, prestation, note, texte, photo FROM avis WHERE status = 'Publié' ORDER BY id DESC`).all());
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -66,14 +77,18 @@ router.post('/api/avis', async (req, res) => {
     const nom = propre(req.body.nom, 80);
     const prestation = propre(req.body.prestation, 120);
     const texte = propre(req.body.texte, 600);
+    const photo = photoValide(req.body.photo);
     const note = Math.min(5, Math.max(1, Number(req.body.note) || 0));
     if (!nom || !prestation || !texte || !note) {
       return res.status(400).json({ error: 'Nom, prestation, note et avis sont requis' });
     }
+    if (req.body.photo && !photo) {
+      return res.status(400).json({ error: 'Photo trop lourde ou format non accepté' });
+    }
     if (usePostgres) {
-      await sql`INSERT INTO avis (nom, prestation, note, texte) VALUES (${nom}, ${prestation}, ${note}, ${texte})`;
+      await sql`INSERT INTO avis (nom, prestation, note, texte, photo) VALUES (${nom}, ${prestation}, ${note}, ${texte}, ${photo || null})`;
     } else {
-      db.prepare('INSERT INTO avis (nom, prestation, note, texte) VALUES (?, ?, ?, ?)').run(nom, prestation, note, texte);
+      db.prepare('INSERT INTO avis (nom, prestation, note, texte, photo) VALUES (?, ?, ?, ?, ?)').run(nom, prestation, note, texte, photo || null);
     }
     res.json({ success: true });
   } catch (err: any) {
