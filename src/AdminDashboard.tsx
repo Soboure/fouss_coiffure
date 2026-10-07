@@ -1,8 +1,7 @@
 // Rôle de ce fichier : le tableau du salon, adresse /admin.
-// Le mot de passe ne lit pas la base tout seul : il obtient un jeton, gardé dans le navigateur.
-// Postgres renvoie clientname et clientphone en minuscules : on lit les deux écritures.
-// Confirmer change le statut. Il n'y a plus de bouton Supprimer.
-// La colonne Source dit si la fiche vient du site ou de l'application.
+// Le mot de passe obtient un jeton, gardé dans le navigateur.
+// Les filtres et le tri se font ici, sur la liste déjà chargée. L'API n'a pas changé.
+// Dernier reçu = plus grand id, la fiche créée en dernier. Ce n'est pas la date du rendez-vous.
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -22,14 +21,38 @@ type Reservation = {
   code?: string;
   source?: string;
   status?: string;
+  createdAt?: string;
+  createdat?: string;
 };
+
+type Statut = 'all' | 'pending' | 'confirmed';
+type Jour = 'all' | 'today' | 'upcoming' | 'past';
+type Espace = 'all' | 'Standard' | 'VIP';
+type Source = 'all' | 'site' | 'app';
+type Tri = 'recent' | 'ancien' | 'rdv' | 'rdv-loin';
+
+function nom(res: Reservation) {
+  return res.clientName || res.clientname || '—';
+}
+
+function telephone(res: Reservation) {
+  return res.clientPhone || res.clientphone || '—';
+}
+
+function aujourdhui() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export default function AdminDashboard() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('fouss_admin_token'));
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed'>('all');
+  const [filter, setFilter] = useState<Statut>('all');
+  const [jour, setJour] = useState<Jour>('all');
+  const [espace, setEspace] = useState<Espace>('all');
+  const [source, setSource] = useState<Source>('all');
+  const [tri, setTri] = useState<Tri>('recent');
   const [searchTerm, setSearchTerm] = useState('');
 
   const fetchReservations = () => {
@@ -81,13 +104,29 @@ export default function AdminDashboard() {
 
   const confirmed = reservations.filter(r => r.status === 'Confirmé').length;
   const pending = reservations.filter(r => r.status !== 'Confirmé').length;
-  const visibles = reservations.filter(res => {
-    if (filter === 'confirmed' && res.status !== 'Confirmé') return false;
-    if (filter === 'pending' && res.status === 'Confirmé') return false;
-    if (!searchTerm) return true;
-    const q = searchTerm.toLowerCase();
-    return [res.clientName, res.clientname, res.clientPhone, res.clientphone, res.service, res.code].some(v => (v || '').toLowerCase().includes(q));
-  });
+  const today = aujourdhui();
+  const derniere = [...reservations].sort((a, b) => b.id - a.id)[0];
+
+  const visibles = reservations
+    .filter(res => {
+      if (filter === 'confirmed' && res.status !== 'Confirmé') return false;
+      if (filter === 'pending' && res.status === 'Confirmé') return false;
+      if (jour === 'today' && res.date !== today) return false;
+      if (jour === 'upcoming' && (!res.date || res.date < today)) return false;
+      if (jour === 'past' && (!res.date || res.date >= today)) return false;
+      if (espace !== 'all' && (res.space || 'Standard') !== espace) return false;
+      if (source !== 'all' && (res.source || 'site') !== source) return false;
+      if (!searchTerm) return true;
+      const q = searchTerm.toLowerCase();
+      return [nom(res), telephone(res), res.service, res.code].some(v => (v || '').toLowerCase().includes(q));
+    })
+    .sort((a, b) => {
+      if (tri === 'recent') return b.id - a.id;
+      if (tri === 'ancien') return a.id - b.id;
+      const cleA = `${a.date || ''} ${a.time || ''}`;
+      const cleB = `${b.date || ''} ${b.time || ''}`;
+      return tri === 'rdv' ? cleA.localeCompare(cleB) : cleB.localeCompare(cleA);
+    });
 
   if (!token) {
     return (
@@ -130,15 +169,49 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        <div className="flex flex-col md:flex-row gap-3 mb-4">
-          <div className="relative flex-1">
+        {derniere && (
+          <section className="bg-white border border-bordeaux rounded-3xl p-5 mb-6">
+            <p className="text-xs uppercase tracking-wide text-bordeaux font-semibold">Dernière réservation reçue</p>
+            <p className="mt-1 font-serif text-2xl">{nom(derniere)}</p>
+            <p className="text-sm text-warm-brown mt-1">
+              {derniere.service} · {derniere.date} à {derniere.time} · {derniere.space === 'VIP' ? 'Suite VIP' : 'Standard'}
+            </p>
+            <p className="text-xs text-taupe mt-1">Fiche n°{derniere.id} · {telephone(derniere)} · {derniere.status === 'Confirmé' ? 'Confirmé' : 'En attente'}</p>
+          </section>
+        )}
+
+        <div className="flex flex-col gap-3 mb-4">
+          <div className="relative">
             <Search size={16} className="absolute left-3 top-3 text-taupe" />
             <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Nom, téléphone, prestation ou code" className="w-full bg-white border border-sable rounded-full pl-9 pr-4 py-2.5 text-sm" />
           </div>
-          <div className="flex gap-2 text-xs font-semibold">
+          <div className="flex flex-wrap gap-2 text-xs font-semibold">
             {([['all', 'Tous'], ['pending', 'En attente'], ['confirmed', 'Confirmés']] as const).map(([id, label]) => (
               <button key={id} onClick={() => setFilter(id)} className={`px-4 py-2 rounded-full ${filter === id ? 'bg-bordeaux text-white' : 'bg-white border border-sable'}`}>{label}</button>
             ))}
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs font-semibold">
+            {([['all', 'Toutes les dates'], ['today', "Aujourd'hui"], ['upcoming', 'À venir'], ['past', 'Passés']] as const).map(([id, label]) => (
+              <button key={id} onClick={() => setJour(id)} className={`px-4 py-2 rounded-full ${jour === id ? 'bg-charcoal text-white' : 'bg-white border border-sable'}`}>{label}</button>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <select value={espace} onChange={e => setEspace(e.target.value as Espace)} className="bg-white border border-sable rounded-full px-4 py-2 text-xs font-semibold">
+              <option value="all">Tous les espaces</option>
+              <option value="Standard">Standard</option>
+              <option value="VIP">Suite VIP</option>
+            </select>
+            <select value={source} onChange={e => setSource(e.target.value as Source)} className="bg-white border border-sable rounded-full px-4 py-2 text-xs font-semibold">
+              <option value="all">Toutes les sources</option>
+              <option value="site">Site</option>
+              <option value="app">Application</option>
+            </select>
+            <select value={tri} onChange={e => setTri(e.target.value as Tri)} className="bg-white border border-sable rounded-full px-4 py-2 text-xs font-semibold">
+              <option value="recent">Dernières reçues</option>
+              <option value="ancien">Plus anciennes</option>
+              <option value="rdv">Rendez-vous le plus proche</option>
+              <option value="rdv-loin">Rendez-vous le plus lointain</option>
+            </select>
           </div>
         </div>
 
@@ -151,10 +224,10 @@ export default function AdminDashboard() {
             </thead>
             <tbody>
               {visibles.map(res => (
-                <tr key={res.id} className="border-b border-sable/70 align-top">
+                <tr key={res.id} className={`border-b border-sable/70 align-top ${derniere && res.id === derniere.id ? 'bg-creme' : ''}`}>
                   <td className="p-4">
-                    <p className="font-semibold">{res.clientName || res.clientname || '—'}</p>
-                    <p className="text-xs text-taupe">{res.clientPhone || res.clientphone || '—'}</p>
+                    <p className="font-semibold">{nom(res)}</p>
+                    <p className="text-xs text-taupe">{telephone(res)}</p>
                   </td>
                   <td className="p-4">
                     <p>{res.service}</p>
@@ -176,7 +249,7 @@ export default function AdminDashboard() {
                   </td>
                 </tr>
               ))}
-              {visibles.length === 0 && <tr><td colSpan={8} className="p-8 text-center text-taupe">Aucune réservation.</td></tr>}
+              {visibles.length === 0 && <tr><td colSpan={8} className="p-8 text-center text-taupe">Aucune réservation pour ces filtres.</td></tr>}
             </tbody>
           </table>
         </div>
