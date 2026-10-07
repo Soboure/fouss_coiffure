@@ -6,6 +6,7 @@
 // Postgres renvoie les colonnes en minuscules : clientname, pas clientName.
 
 import express from 'express';
+import avisRouter from './avis';
 import { sql } from '@vercel/postgres';
 import crypto from 'crypto';
 
@@ -191,5 +192,7 @@ app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
   }
 });
 
+
+app.use(avisRouter);
 
 export default app;
