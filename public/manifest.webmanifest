@@ -6,18 +6,18 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#8C1913",
-  "theme_color": "#8C1913",
+  "background_color": "#F7F3EF",
+  "theme_color": "#F7F3EF",
   "lang": "fr",
   "icons": [
     {
-      "src": "/logo-fouss.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logo-fouss.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
