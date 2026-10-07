@@ -1,19 +1,58 @@
-// Avis clients, affichés sur l'accueil avant la réservation.
-// Ce sont des exemples. Remplace le texte, le prénom et la prestation par de vrais retours.
-// Pour en ajouter un : copie un objet dans la liste avis.
+// Avis clients sur l'accueil.
+// La liste vient de GET /api/avis, seulement les avis publiés.
+// Le formulaire envoie POST /api/avis. Le salon publie ensuite dans l'admin.
 
+import { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
 
-const avis = [
-  { nom: 'Amina', prestation: 'Tresses artistiques', note: 5, texte: 'Le rendu est net, et on m\'a expliqué comment les garder. Je reviendrai pour une cérémonie.' },
-  { nom: 'Kodjo', prestation: 'Dégradé et barbe', note: 5, texte: 'Contours propres, sans attente interminable. Le créneau de 18h était respecté.' },
-  { nom: 'Fatoumata', prestation: 'Soin nappy', note: 5, texte: 'Cheveux souples après le soin. La cabine est calme, on n\'est pas pressé.' },
-  { nom: 'Sarah', prestation: 'Nattes collées', note: 4, texte: 'Très belle ligne. J\'aurais aimé une photo du dos avant de partir, sinon rien à dire.' },
-  { nom: 'Ibrahim', prestation: 'Suite VIP', note: 5, texte: 'J\'ai pris la cabine privée pour une coupe avant un rendez-vous. Tranquille, et le thé était là.' },
-  { nom: 'Mariam', prestation: 'Soin visage', note: 5, texte: 'Peau nette sans tirer. On m\'a dit quoi éviter les jours d\'après, c\'est ça que je retiens.' },
-];
+type AvisClient = {
+  id: number;
+  nom: string;
+  prestation: string;
+  note: number;
+  texte: string;
+};
 
 export default function Avis() {
+  const [avis, setAvis] = useState<AvisClient[]>([]);
+  const [nom, setNom] = useState('');
+  const [prestation, setPrestation] = useState('');
+  const [note, setNote] = useState(5);
+  const [texte, setTexte] = useState('');
+  const [message, setMessage] = useState('');
+  const [envoi, setEnvoi] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/avis')
+      .then((res) => res.json())
+      .then((data) => { if (Array.isArray(data)) setAvis(data); })
+      .catch(() => setAvis([]));
+  }, []);
+
+  async function envoyer(e: React.FormEvent) {
+    e.preventDefault();
+    setEnvoi(true);
+    setMessage('');
+    try {
+      const res = await fetch('/api/avis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom, prestation, note, texte }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Envoi impossible');
+      setNom('');
+      setPrestation('');
+      setTexte('');
+      setNote(5);
+      setMessage('Merci. Le salon lit l’avis avant de l’afficher.');
+    } catch (err: any) {
+      setMessage(err.message || 'Envoi impossible');
+    } finally {
+      setEnvoi(false);
+    }
+  }
+
   return (
     <section id="avis" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -21,12 +60,13 @@ export default function Avis() {
           <span className="text-gold-dark text-xs font-bold tracking-widest uppercase">Avis clients</span>
           <h2 className="text-3xl md:text-4xl font-serif font-bold text-charcoal mt-2">Ils sont passés au salon</h2>
           <p className="text-warm-brown mt-3 max-w-md mx-auto text-sm leading-relaxed">
-            Retours après une prestation. Le salon confirme chaque rendez-vous.
+            Laisse ton prénom, la prestation et un avis. Il s’affiche après validation du salon.
           </p>
         </div>
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {avis.map((item) => (
-            <article key={item.nom + item.prestation} className="bg-creme border border-sable rounded-3xl p-5">
+            <article key={item.id} className="bg-creme border border-sable rounded-3xl p-5">
               <div className="flex gap-1 text-bordeaux" aria-label={`${item.note} sur 5`}>
                 {Array.from({ length: 5 }, (_, i) => (
                   <Star key={i} size={14} fill={i < item.note ? 'currentColor' : 'none'} />
@@ -37,7 +77,27 @@ export default function Avis() {
               <p className="text-xs text-taupe">{item.prestation}</p>
             </article>
           ))}
+          {avis.length === 0 && (
+            <p className="text-sm text-taupe md:col-span-2 lg:col-span-3">Les premiers avis publiés apparaîtront ici.</p>
+          )}
         </div>
+
+        <form onSubmit={envoyer} className="mt-10 max-w-xl mx-auto bg-creme border border-sable rounded-3xl p-5 space-y-3">
+          <p className="font-semibold">Laisser un avis</p>
+          <input value={nom} onChange={(e) => setNom(e.target.value)} required placeholder="Prénom" className="w-full border border-sable rounded-xl px-4 py-3 text-sm bg-white" />
+          <input value={prestation} onChange={(e) => setPrestation(e.target.value)} required placeholder="Prestation" className="w-full border border-sable rounded-xl px-4 py-3 text-sm bg-white" />
+          <label className="block text-xs text-taupe">
+            Note
+            <select value={note} onChange={(e) => setNote(Number(e.target.value))} className="mt-1 w-full border border-sable rounded-xl px-4 py-3 text-sm bg-white text-charcoal">
+              {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} / 5</option>)}
+            </select>
+          </label>
+          <textarea value={texte} onChange={(e) => setTexte(e.target.value)} required maxLength={600} placeholder="Ton avis" className="w-full border border-sable rounded-xl px-4 py-3 text-sm bg-white min-h-28" />
+          <button disabled={envoi} className="bg-bordeaux text-white rounded-full px-5 py-3 text-sm font-semibold">
+            {envoi ? 'Envoi...' : 'Envoyer mon avis'}
+          </button>
+          {message && <p className="text-sm text-warm-brown">{message}</p>}
+        </form>
       </div>
     </section>
   );
