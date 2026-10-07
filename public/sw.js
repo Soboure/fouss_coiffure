@@ -1,8 +1,8 @@
 /* Service worker. Le navigateur le garde à côté du site.
    SHELL = pages disponibles si le réseau tombe.
-   Pour forcer une mise à jour : changer fouss-shell-v2 en v3. */
-const CACHE = "fouss-shell-v2";
-const SHELL = ["/", "/index.html", "/logo-fouss.png", "/manifest.webmanifest"];
+   Pour forcer une mise à jour : changer fouss-shell-v3 en v4. */
+const CACHE = "fouss-shell-v3";
+const SHELL = ["/", "/index.html", "/icons/icon-192.png", "/icons/icon-512.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
