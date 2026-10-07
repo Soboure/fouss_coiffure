@@ -11,7 +11,7 @@ import { sql } from '@vercel/postgres';
 import crypto from 'crypto';
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 
 // In-memory active admin sessions
 const sessions = new Set<string>();
