@@ -1,7 +1,6 @@
 // Rôle de ce fichier : le tableau du salon, adresse /admin.
-// Le mot de passe obtient un jeton, gardé dans le navigateur.
 // Les filtres et le tri se font ici, sur la liste déjà chargée. L'API n'a pas changé.
-// Dernier reçu = plus grand id, la fiche créée en dernier. Ce n'est pas la date du rendez-vous.
+// Dernier reçu = plus grand id. Le tri par défaut le met en première ligne du tableau.
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -21,8 +20,6 @@ type Reservation = {
   code?: string;
   source?: string;
   status?: string;
-  createdAt?: string;
-  createdat?: string;
 };
 
 type Statut = 'all' | 'pending' | 'confirmed';
@@ -105,7 +102,6 @@ export default function AdminDashboard() {
   const confirmed = reservations.filter(r => r.status === 'Confirmé').length;
   const pending = reservations.filter(r => r.status !== 'Confirmé').length;
   const today = aujourdhui();
-  const derniere = [...reservations].sort((a, b) => b.id - a.id)[0];
 
   const visibles = reservations
     .filter(res => {
@@ -169,17 +165,6 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {derniere && (
-          <section className="bg-white border border-bordeaux rounded-3xl p-5 mb-6">
-            <p className="text-xs uppercase tracking-wide text-bordeaux font-semibold">Dernière réservation reçue</p>
-            <p className="mt-1 font-serif text-2xl">{nom(derniere)}</p>
-            <p className="text-sm text-warm-brown mt-1">
-              {derniere.service} · {derniere.date} à {derniere.time} · {derniere.space === 'VIP' ? 'Suite VIP' : 'Standard'}
-            </p>
-            <p className="text-xs text-taupe mt-1">Fiche n°{derniere.id} · {telephone(derniere)} · {derniere.status === 'Confirmé' ? 'Confirmé' : 'En attente'}</p>
-          </section>
-        )}
-
         <div className="flex flex-col gap-3 mb-4">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-3 text-taupe" />
@@ -224,7 +209,7 @@ export default function AdminDashboard() {
             </thead>
             <tbody>
               {visibles.map(res => (
-                <tr key={res.id} className={`border-b border-sable/70 align-top ${derniere && res.id === derniere.id ? 'bg-creme' : ''}`}>
+                <tr key={res.id} className="border-b border-sable/70 align-top">
                   <td className="p-4">
                     <p className="font-semibold">{nom(res)}</p>
                     <p className="text-xs text-taupe">{telephone(res)}</p>
