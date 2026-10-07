@@ -59,6 +59,7 @@ const photosSoins: Photo[] = [
 const photosStyle: Photo[] = [
   { src: '/galerie/Showroom1.jpg', title: 'Le Showroom', price: 'Entrée libre' },
   { src: '/galerie/Showroom2.jpg', title: 'Robes de Créateurs', price: 'Prix au salon' },
+  { src: '/galerie/1.jpg', title: 'Tenues stylé', price: '40000 fcfa'},
 ];
 
 export default function Galerie() {
