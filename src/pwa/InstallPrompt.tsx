@@ -1,8 +1,8 @@
-// Banniere d'installation. Chrome ne montre plus la sienne tout seul.
-// On affiche la notre des l'arrivee sur le site.
-// Sur Android, le bouton appelle la vraie installation des que beforeinstallprompt arrive.
-// Sur iPhone, ce evenement n'existe pas : on explique le geste Partager.
-// Masquee si l'app est deja lancee depuis l'ecran d'accueil, ou si la personne ferme la banniere.
+// Bannière d'installation. Chrome ne montre plus la sienne tout seul.
+// On affiche la nôtre dès l'arrivée sur le site.
+// Sur Android, le bouton appelle la vraie installation dès que beforeinstallprompt arrive.
+// Sur iPhone, cet événement n'existe pas : on explique le geste Partager.
+// Masquée si l'app est déjà lancée depuis l'écran d'accueil, ou si la personne ferme la bannière.
 
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -70,8 +70,8 @@ export default function InstallPrompt() {
         <p className="font-semibold">Installer Fouss</p>
         <p className="text-sm text-[#E7DDD6] mt-1">
           {iphone
-            ? "Sur iPhone : Partager, puis Sur l'ecran d'accueil."
-            : "Ajoute le salon a ton ecran d'accueil, comme une application."}
+            ? "Sur iPhone : Partager, puis Sur l'écran d'accueil."
+            : "Ajoute le salon à ton écran d'accueil, comme une application."}
         </p>
         {!iphone && (
           <button
@@ -80,7 +80,7 @@ export default function InstallPrompt() {
             disabled={!invite}
             className="mt-3 rounded-full bg-[#8C1913] px-4 py-2 text-sm font-semibold disabled:opacity-60"
           >
-            {invite ? "Installer" : "Preparation..."}
+            {invite ? "Installer" : "Préparation..."}
           </button>
         )}
       </div>
