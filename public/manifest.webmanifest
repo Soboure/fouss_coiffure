@@ -2,7 +2,7 @@
   "name": "Fouss Coiffure",
   "short_name": "Fouss",
   "description": "Réserver une prestation au salon Fouss Coiffure, Cotonou.",
-  "start_url": "/app",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
