@@ -1,8 +1,7 @@
 // Rôle de ce fichier : la porte des rendez-vous.
 // POST /api/reservations — ouvert.
-// GET/PATCH/DELETE — admin (X-Admin-Token).
-// Sur Vercel : utilise POSTGRES_URL (ou DATABASE_URL / POSTGRES_PRISMA_URL).
-// En local : fallback SQLite si aucune URL Postgres.
+// GET /api/health — diagnostic (pas de base de données).
+// GET/PATCH/DELETE /api/reservations — admin.
 
 import express from 'express';
 import avisRouter from './avis';
@@ -12,6 +11,21 @@ const app = express();
 app.use(express.json({ limit: '2mb' }));
 
 const sessions = new Set<string>();
+
+// Diagnostic : ne touche pas à la base. Permet de voir si la fonction démarre.
+app.get('/api/health', (req, res) => {
+  const hasPostgres =
+    !!process.env.POSTGRES_URL ||
+    !!process.env.DATABASE_URL ||
+    !!process.env.POSTGRES_PRISMA_URL ||
+    !!process.env.POSTGRES_URL_NON_POOLING;
+  res.json({
+    ok: true,
+    vercel: !!process.env.VERCEL,
+    hasPostgresUrl: hasPostgres,
+    time: new Date().toISOString()
+  });
+});
 
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
@@ -32,7 +46,6 @@ const adminAuth = (req: express.Request, res: express.Response, next: express.Ne
   next();
 };
 
-// Cherche une URL Postgres parmi les noms courants
 const postgresUrl =
   process.env.POSTGRES_URL ||
   process.env.DATABASE_URL ||
@@ -41,7 +54,6 @@ const postgresUrl =
 
 const usePostgres = !!postgresUrl;
 const isVercel = !!process.env.VERCEL;
-console.log('DB mode:', usePostgres ? 'Postgres' : 'SQLite', '| Vercel:', isVercel, '| URL present:', !!postgresUrl);
 
 let db: any;
 let sql: any;
@@ -58,7 +70,7 @@ const initDb = async () => {
   if (isInitialized) return;
 
   if (isVercel && !usePostgres) {
-    throw new Error('Aucune URL Postgres trouvée (POSTGRES_URL, DATABASE_URL, etc.). Vérifie les Environment Variables.');
+    throw new Error('Aucune URL Postgres (POSTGRES_URL / DATABASE_URL). Vérifie les Environment Variables.');
   }
 
   if (!usePostgres) {
@@ -78,21 +90,14 @@ const initDb = async () => {
     return;
   }
 
-  // Postgres
   const s = await getSql();
   await s`
     CREATE TABLE IF NOT EXISTS reservations (
       id SERIAL PRIMARY KEY,
-      service VARCHAR(255),
-      date VARCHAR(255),
-      time VARCHAR(255),
-      space VARCHAR(255),
-      clientName VARCHAR(255),
-      clientPhone VARCHAR(255),
+      service VARCHAR(255), date VARCHAR(255), time VARCHAR(255), space VARCHAR(255),
+      clientName VARCHAR(255), clientPhone VARCHAR(255),
       status VARCHAR(255) DEFAULT 'En attente',
-      code VARCHAR(32),
-      price VARCHAR(255),
-      source VARCHAR(32) DEFAULT 'site',
+      code VARCHAR(32), price VARCHAR(255), source VARCHAR(32) DEFAULT 'site',
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `;
@@ -110,11 +115,9 @@ app.get('/api/reservations', adminAuth, async (req, res) => {
       const { rows } = await s`SELECT * FROM reservations ORDER BY date DESC, time DESC`;
       res.json(rows);
     } else {
-      const stmt = db.prepare('SELECT * FROM reservations ORDER BY date DESC, time DESC');
-      res.json(stmt.all());
+      res.json(db.prepare('SELECT * FROM reservations ORDER BY date DESC, time DESC').all());
     }
   } catch (err: any) {
-    console.error('GET error:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
@@ -123,11 +126,9 @@ app.post('/api/reservations', async (req, res) => {
   try {
     await initDb();
     const { service, date, time, space, clientName, clientPhone, code, price, source } = req.body;
-
     if (!service || !date || !time || !clientName || !clientPhone) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-
     const espace = space || 'Standard';
     const origine = source || 'site';
 
@@ -141,20 +142,18 @@ app.post('/api/reservations', async (req, res) => {
       return res.json({ id: rows[0].id, code: rows[0].code, success: true });
     }
 
-    if (!db) throw new Error('SQLite not initialized');
-    const stmt = db.prepare(
+    const info = db.prepare(
       'INSERT INTO reservations (service, date, time, space, clientName, clientPhone, code, price, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    );
-    const info = stmt.run(service, date, time, espace, clientName, clientPhone, code || null, price || null, origine);
+    ).run(service, date, time, espace, clientName, clientPhone, code || null, price || null, origine);
     res.json({ id: info.lastInsertRowid, code, success: true });
   } catch (err: any) {
-    console.error('POST reservation error:', err);
+    console.error(err);
     res.status(500).json({
       error: 'Failed to create reservation',
       details: err.message,
       hint: !usePostgres
-        ? 'Aucune connexion Postgres. Vérifie POSTGRES_URL (ou DATABASE_URL) dans les Environment Variables Vercel, puis redéploie.'
-        : 'Erreur de connexion à la base. Vérifie que la variable Postgres est valide et que la base est accessible.'
+        ? 'Aucune URL Postgres. Vérifie POSTGRES_URL dans les Environment Variables puis redéploie.'
+        : 'Connexion Postgres échouée. Vérifie la variable et la base Neon.'
     });
   }
 });
@@ -167,12 +166,10 @@ app.patch('/api/reservations/:id', adminAuth, async (req, res) => {
       const s = await getSql();
       await s`UPDATE reservations SET status = ${status} WHERE id = ${req.params.id}`;
     } else {
-      const stmt = db.prepare('UPDATE reservations SET status = ? WHERE id = ?');
-      stmt.run(status, req.params.id);
+      db.prepare('UPDATE reservations SET status = ? WHERE id = ?').run(status, req.params.id);
     }
     res.json({ success: true });
   } catch (err: any) {
-    console.error(err);
     res.status(500).json({ error: 'Failed to update', details: err.message });
   }
 });
@@ -184,12 +181,10 @@ app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
       const s = await getSql();
       await s`DELETE FROM reservations WHERE id = ${req.params.id}`;
     } else {
-      const stmt = db.prepare('DELETE FROM reservations WHERE id = ?');
-      stmt.run(req.params.id);
+      db.prepare('DELETE FROM reservations WHERE id = ?').run(req.params.id);
     }
     res.json({ success: true });
   } catch (err: any) {
-    console.error(err);
     res.status(500).json({ error: 'Failed to delete', details: err.message });
   }
 });
