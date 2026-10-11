@@ -2,8 +2,8 @@
 // Le site et l'application envoient une fiche en POST /api/reservations.
 // Champs utiles : service, date, time, clientName, clientPhone, space, code, price, source.
 // Lire, confirmer ou supprimer exige le jeton administrateur, envoyé dans X-Admin-Token.
-// Si POSTGRES_URL existe, les fiches vont dans Postgres. Sinon, dans salon.db, en local seulement.
-// Postgres renvoie les colonnes en minuscules : clientname, pas clientName.
+// Sur Vercel (serverless) : POSTGRES_URL est obligatoire. SQLite ne fonctionne pas.
+// En local sans POSTGRES_URL : fallback SQLite (salon.db).
 
 import express from 'express';
 import avisRouter from './avis';
@@ -38,16 +38,21 @@ const adminAuth = (req: express.Request, res: express.Response, next: express.Ne
 };
 
 const usePostgres = !!process.env.POSTGRES_URL;
-console.log("Database mode detected:", usePostgres ? "Postgres" : "SQLite");
+const isVercel = !!process.env.VERCEL;
+console.log("Database mode detected:", usePostgres ? "Postgres" : "SQLite", "| Vercel:", isVercel);
 let db: any;
 
 // Initialize database
 let isInitialized = false;
 const initDb = async () => {
   if (isInitialized) return;
-  
+
+  if (isVercel && !usePostgres) {
+    throw new Error('POSTGRES_URL is required on Vercel. Add a Vercel Postgres database and the POSTGRES_URL env var.');
+  }
+
   if (!usePostgres) {
-    console.warn("POSTGRES_URL not found. Falling back to SQLite.");
+    console.warn("POSTGRES_URL not found. Falling back to SQLite (local only).");
     try {
       const { default: Database } = await import('better-sqlite3');
       db = new Database('salon.db');
@@ -74,6 +79,7 @@ const initDb = async () => {
       console.log("SQLite table checked/created");
     } catch (e) {
       console.error("SQLite init error:", e);
+      throw e;
     }
   } else {
     try {
@@ -100,6 +106,7 @@ const initDb = async () => {
       console.log("Postgres table checked/created");
     } catch (err) {
       console.error("Postgres init error:", err);
+      throw err;
     }
   }
 };
@@ -126,7 +133,7 @@ app.post('/api/reservations', async (req, res) => {
   try {
     await initDb();
     const { service, date, time, space, clientName, clientPhone, code, price, source } = req.body;
-    
+
     if (!service || !date || !time || !clientName || !clientPhone) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -148,10 +155,13 @@ app.post('/api/reservations', async (req, res) => {
     }
   } catch (err: any) {
     console.error('POST reservation error:', err);
-    res.status(500).json({ 
-      error: 'Failed to create reservation', 
+    const hint = isVercel && !usePostgres
+      ? 'POSTGRES_URL manquant sur Vercel. Créez une base Postgres dans le projet Vercel et ajoutez la variable d\'environnement POSTGRES_URL.'
+      : !usePostgres ? 'POSTGRES_URL is missing (local SQLite failed).' : 'Check your database connection.';
+    res.status(500).json({
+      error: 'Failed to create reservation',
       details: err.message,
-      hint: !usePostgres ? 'POSTGRES_URL is missing.' : 'Check your database connection.'
+      hint
     });
   }
 });
@@ -159,6 +169,7 @@ app.post('/api/reservations', async (req, res) => {
 // Change le statut : En attente ou Confirmé.
 app.patch('/api/reservations/:id', adminAuth, async (req, res) => {
   try {
+    await initDb();
     const { status } = req.body;
     if (usePostgres) {
       await sql`UPDATE reservations SET status = ${status} WHERE id = ${req.params.id}`;
@@ -174,8 +185,7 @@ app.patch('/api/reservations/:id', adminAuth, async (req, res) => {
   }
 });
 
-
-// Suppression technique. Le bouton n'est plus dans le tableau.
+// Suppression technique.
 app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
   try {
     await initDb();
@@ -191,7 +201,6 @@ app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete reservation' });
   }
 });
-
 
 app.use(avisRouter);
 
