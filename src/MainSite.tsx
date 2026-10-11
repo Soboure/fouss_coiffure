@@ -178,7 +178,7 @@ export default function MainSite() {
       } else {
         const errorData = await res.json();
         console.error('Booking error:', errorData);
-        alert(`Erreur lors de la réservation: ${errorData.error || 'Erreur de connexion'}`);
+        alert(`Erreur lors de la réservation: ${errorData.error || 'Erreur de connexion'}\n${errorData.hint || ''}`);
         setBookingStatus('idle');
       }
     } catch (err) {
@@ -385,8 +385,18 @@ export default function MainSite() {
                 {currentStep === 1 && (
                   <div className="space-y-4">
                     <p className="text-sm font-semibold">Prestation</p>
-                    <p className="text-sm text-warm-brown">Allez dans Tarifs et Services, choisissez coiffure femme, coiffure homme ou coiffure enfant, puis appuyez sur Réserver.</p>
-                    <Link to="/tarifs" className="inline-flex items-center justify-center bg-bordeaux text-white px-6 py-3 rounded-full text-sm font-bold">Choisir dans Tarifs et Services</Link>
+                    <select
+                      value={formData.service}
+                      onChange={e => setFormData({ ...formData, service: e.target.value })}
+                      className="w-full border border-sable rounded-2xl px-4 py-3 text-sm bg-white"
+                      required
+                    >
+                      <option value="">Choisir une prestation...</option>
+                      {allServicesList.map(s => (
+                        <option key={s.id || s.name} value={s.name}>{s.name} — {s.price}</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-taupe">Ou <Link to="/tarifs" className="text-bordeaux underline">voir le catalogue complet</Link></p>
                     {formData.service && <p className="rounded-2xl border border-bordeaux bg-creme px-4 py-3 text-sm font-semibold">{formData.service}</p>}
                     <p className="text-sm font-semibold pt-2">Où ?</p>
                     <div className="grid grid-cols-2 gap-3">
