@@ -26,7 +26,7 @@ export default function AppShell() {
           <h2 className="mt-1 text-2xl font-serif">Prendre un rendez-vous</h2>
           <p className="mt-2 text-sm text-[#5C463F]">Trois étapes. Le salon confirme ensuite. Dimanche : événement VIP seulement.</p>
           <Link
-            to="/#reservation"
+            to="/#booking"
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#8C1913] text-white px-5 py-3 text-sm font-semibold"
           >
             <CalendarClock size={16} />
@@ -49,7 +49,7 @@ export default function AppShell() {
         <Link to="/app" className="text-xs font-semibold text-[#8C1913]">Accueil</Link>
         <Link to="/tarifs" className="text-xs text-[#5C463F]">Tarifs</Link>
         <Link to="/galerie" className="text-xs text-[#5C463F]">Galerie</Link>
-        <Link to="/#reservation" className="text-xs text-[#5C463F]">Réserver</Link>
+        <Link to="/#booking" className="text-xs text-[#5C463F]">Réserver</Link>
       </nav>
     </div>
   );
