@@ -1,22 +1,18 @@
 // Rôle de ce fichier : la porte des rendez-vous.
-// Le site et l'application envoient une fiche en POST /api/reservations.
-// Champs utiles : service, date, time, clientName, clientPhone, space, code, price, source.
-// Lire, confirmer ou supprimer exige le jeton administrateur, envoyé dans X-Admin-Token.
-// Sur Vercel (serverless) : POSTGRES_URL est obligatoire. SQLite ne fonctionne pas.
-// En local sans POSTGRES_URL : fallback SQLite (salon.db).
+// POST /api/reservations — ouvert.
+// GET/PATCH/DELETE — admin (X-Admin-Token).
+// Sur Vercel : utilise POSTGRES_URL (ou DATABASE_URL / POSTGRES_PRISMA_URL).
+// En local : fallback SQLite si aucune URL Postgres.
 
 import express from 'express';
 import avisRouter from './avis';
-import { sql } from '@vercel/postgres';
 import crypto from 'crypto';
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
 
-// In-memory active admin sessions
 const sessions = new Set<string>();
 
-// Connexion : le mot de passe vient de ADMIN_PASSWORD, sinon du secours écrit plus bas.
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
   const expectedPassword = process.env.ADMIN_PASSWORD || 'fouss2024';
@@ -28,7 +24,6 @@ app.post('/api/admin/login', (req, res) => {
   return res.status(401).json({ error: 'Mot de passe incorrect' });
 });
 
-// Vérifie le jeton. Sans lui, la liste et les changements sont refusés.
 const adminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const token = req.headers['x-admin-token'];
   if (!token || !sessions.has(token as string)) {
@@ -37,98 +32,93 @@ const adminAuth = (req: express.Request, res: express.Response, next: express.Ne
   next();
 };
 
-const usePostgres = !!process.env.POSTGRES_URL;
-const isVercel = !!process.env.VERCEL;
-console.log("Database mode detected:", usePostgres ? "Postgres" : "SQLite", "| Vercel:", isVercel);
-let db: any;
+// Cherche une URL Postgres parmi les noms courants
+const postgresUrl =
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL_NON_POOLING;
 
-// Initialize database
+const usePostgres = !!postgresUrl;
+const isVercel = !!process.env.VERCEL;
+console.log('DB mode:', usePostgres ? 'Postgres' : 'SQLite', '| Vercel:', isVercel, '| URL present:', !!postgresUrl);
+
+let db: any;
+let sql: any;
 let isInitialized = false;
+
+async function getSql() {
+  if (sql) return sql;
+  const mod = await import('@vercel/postgres');
+  sql = mod.sql;
+  return sql;
+}
+
 const initDb = async () => {
   if (isInitialized) return;
 
   if (isVercel && !usePostgres) {
-    throw new Error('POSTGRES_URL is required on Vercel. Add a Vercel Postgres database and the POSTGRES_URL env var.');
+    throw new Error('Aucune URL Postgres trouvée (POSTGRES_URL, DATABASE_URL, etc.). Vérifie les Environment Variables.');
   }
 
   if (!usePostgres) {
-    console.warn("POSTGRES_URL not found. Falling back to SQLite (local only).");
-    try {
-      const { default: Database } = await import('better-sqlite3');
-      db = new Database('salon.db');
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS reservations (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          service TEXT,
-          date TEXT,
-          time TEXT,
-          space TEXT,
-          clientName TEXT,
-          clientPhone TEXT,
-          status TEXT DEFAULT 'En attente',
-          code TEXT,
-          price TEXT,
-          source TEXT DEFAULT 'site',
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-      for (const colonne of ['code TEXT', 'price TEXT', "source TEXT DEFAULT 'site'"]) {
-        try { db.exec(`ALTER TABLE reservations ADD COLUMN ${colonne}`); } catch (e) {}
-      }
-      isInitialized = true;
-      console.log("SQLite table checked/created");
-    } catch (e) {
-      console.error("SQLite init error:", e);
-      throw e;
-    }
-  } else {
-    try {
-      await sql`
-        CREATE TABLE IF NOT EXISTS reservations (
-          id SERIAL PRIMARY KEY,
-          service VARCHAR(255),
-          date VARCHAR(255),
-          time VARCHAR(255),
-          space VARCHAR(255),
-          clientName VARCHAR(255),
-          clientPhone VARCHAR(255),
-          status VARCHAR(255) DEFAULT 'En attente',
-          code VARCHAR(32),
-          price VARCHAR(255),
-          source VARCHAR(32) DEFAULT 'site',
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `;
-      await sql`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS code VARCHAR(32)`;
-      await sql`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS price VARCHAR(255)`;
-      await sql`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS source VARCHAR(32) DEFAULT 'site'`;
-      isInitialized = true;
-      console.log("Postgres table checked/created");
-    } catch (err) {
-      console.error("Postgres init error:", err);
-      throw err;
-    }
+    const { default: Database } = await import('better-sqlite3');
+    db = new Database('salon.db');
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS reservations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        service TEXT, date TEXT, time TEXT, space TEXT,
+        clientName TEXT, clientPhone TEXT,
+        status TEXT DEFAULT 'En attente',
+        code TEXT, price TEXT, source TEXT DEFAULT 'site',
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    isInitialized = true;
+    return;
   }
+
+  // Postgres
+  const s = await getSql();
+  await s`
+    CREATE TABLE IF NOT EXISTS reservations (
+      id SERIAL PRIMARY KEY,
+      service VARCHAR(255),
+      date VARCHAR(255),
+      time VARCHAR(255),
+      space VARCHAR(255),
+      clientName VARCHAR(255),
+      clientPhone VARCHAR(255),
+      status VARCHAR(255) DEFAULT 'En attente',
+      code VARCHAR(32),
+      price VARCHAR(255),
+      source VARCHAR(32) DEFAULT 'site',
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+  await s`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS code VARCHAR(32)`;
+  await s`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS price VARCHAR(255)`;
+  await s`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS source VARCHAR(32) DEFAULT 'site'`;
+  isInitialized = true;
 };
 
-// Liste des fiches. Réservée à l'administrateur.
 app.get('/api/reservations', adminAuth, async (req, res) => {
   try {
     await initDb();
     if (usePostgres) {
-      const { rows } = await sql`SELECT * FROM reservations ORDER BY date DESC, time DESC`;
+      const s = await getSql();
+      const { rows } = await s`SELECT * FROM reservations ORDER BY date DESC, time DESC`;
       res.json(rows);
     } else {
       const stmt = db.prepare('SELECT * FROM reservations ORDER BY date DESC, time DESC');
       res.json(stmt.all());
     }
   } catch (err: any) {
-    console.error("GET reservations error:", err);
+    console.error('GET error:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
 
-// Création d'une fiche. Ouvert au site et à l'application, sans mot de passe.
 app.post('/api/reservations', async (req, res) => {
   try {
     await initDb();
@@ -137,68 +127,70 @@ app.post('/api/reservations', async (req, res) => {
     if (!service || !date || !time || !clientName || !clientPhone) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+
     const espace = space || 'Standard';
     const origine = source || 'site';
 
     if (usePostgres) {
-      const { rows } = await sql`
+      const s = await getSql();
+      const { rows } = await s`
         INSERT INTO reservations (service, date, time, space, clientName, clientPhone, code, price, source)
         VALUES (${service}, ${date}, ${time}, ${espace}, ${clientName}, ${clientPhone}, ${code || null}, ${price || null}, ${origine})
         RETURNING id, code
       `;
-      res.json({ id: rows[0].id, code: rows[0].code, success: true });
-    } else {
-      if (!db) throw new Error('SQLite database not initialized');
-      const stmt = db.prepare('INSERT INTO reservations (service, date, time, space, clientName, clientPhone, code, price, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-      const info = stmt.run(service, date, time, espace, clientName, clientPhone, code || null, price || null, origine);
-      res.json({ id: info.lastInsertRowid, code, success: true });
+      return res.json({ id: rows[0].id, code: rows[0].code, success: true });
     }
+
+    if (!db) throw new Error('SQLite not initialized');
+    const stmt = db.prepare(
+      'INSERT INTO reservations (service, date, time, space, clientName, clientPhone, code, price, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+    const info = stmt.run(service, date, time, espace, clientName, clientPhone, code || null, price || null, origine);
+    res.json({ id: info.lastInsertRowid, code, success: true });
   } catch (err: any) {
     console.error('POST reservation error:', err);
-    const hint = isVercel && !usePostgres
-      ? 'POSTGRES_URL manquant sur Vercel. Créez une base Postgres dans le projet Vercel et ajoutez la variable d\'environnement POSTGRES_URL.'
-      : !usePostgres ? 'POSTGRES_URL is missing (local SQLite failed).' : 'Check your database connection.';
     res.status(500).json({
       error: 'Failed to create reservation',
       details: err.message,
-      hint
+      hint: !usePostgres
+        ? 'Aucune connexion Postgres. Vérifie POSTGRES_URL (ou DATABASE_URL) dans les Environment Variables Vercel, puis redéploie.'
+        : 'Erreur de connexion à la base. Vérifie que la variable Postgres est valide et que la base est accessible.'
     });
   }
 });
 
-// Change le statut : En attente ou Confirmé.
 app.patch('/api/reservations/:id', adminAuth, async (req, res) => {
   try {
     await initDb();
     const { status } = req.body;
     if (usePostgres) {
-      await sql`UPDATE reservations SET status = ${status} WHERE id = ${req.params.id}`;
-      res.json({ success: true });
+      const s = await getSql();
+      await s`UPDATE reservations SET status = ${status} WHERE id = ${req.params.id}`;
     } else {
       const stmt = db.prepare('UPDATE reservations SET status = ? WHERE id = ?');
       stmt.run(status, req.params.id);
-      res.json({ success: true });
     }
-  } catch (err) {
+    res.json({ success: true });
+  } catch (err: any) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to update reservation' });
+    res.status(500).json({ error: 'Failed to update', details: err.message });
   }
 });
 
-// Suppression technique.
 app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
   try {
     await initDb();
     if (usePostgres) {
-      await sql`DELETE FROM reservations WHERE id = ${req.params.id}`;
+      const s = await getSql();
+      await s`DELETE FROM reservations WHERE id = ${req.params.id}`;
     } else {
       const stmt = db.prepare('DELETE FROM reservations WHERE id = ?');
       stmt.run(req.params.id);
     }
     res.json({ success: true });
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to delete reservation' });
+    res.status(500).json({ error: 'Failed to delete', details: err.message });
   }
 });
 
