@@ -204,7 +204,7 @@ app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
     } else {
       db.prepare('DELETE FROM reservations WHERE id = ?').run(req.params.id);
     }
-    res.status(500).json({ error: 'Failed to delete', details: err.message });
+    res.json({ success: true });
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to delete', details: err.message });
   }
