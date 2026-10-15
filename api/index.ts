@@ -12,17 +12,22 @@ app.use(express.json({ limit: '2mb' }));
 
 const sessions = new Set<string>();
 
-// Diagnostic : ne touche pas à la base. Permet de voir si la fonction démarre.
+const postgresUrl =
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL_NON_POOLING;
+
+const usePostgres = !!postgresUrl;
+const isVercel = !!process.env.VERCEL;
+
+// Diagnostic : ne touche pas à la base.
 app.get('/api/health', (req, res) => {
-  const hasPostgres =
-    !!process.env.POSTGRES_URL ||
-    !!process.env.DATABASE_URL ||
-    !!process.env.POSTGRES_PRISMA_URL ||
-    !!process.env.POSTGRES_URL_NON_POOLING;
   res.json({
     ok: true,
-    vercel: !!process.env.VERCEL,
-    hasPostgresUrl: hasPostgres,
+    vercel: isVercel,
+    hasPostgresUrl: usePostgres,
+    mode: usePostgres ? 'postgres' : (isVercel ? 'missing-postgres' : 'sqlite'),
     time: new Date().toISOString()
   });
 });
@@ -46,15 +51,6 @@ const adminAuth = (req: express.Request, res: express.Response, next: express.Ne
   next();
 };
 
-const postgresUrl =
-  process.env.POSTGRES_URL ||
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_PRISMA_URL ||
-  process.env.POSTGRES_URL_NON_POOLING;
-
-const usePostgres = !!postgresUrl;
-const isVercel = !!process.env.VERCEL;
-
 let db: any;
 let sql: any;
 let isInitialized = false;
@@ -69,15 +65,16 @@ async function getSql() {
 const initDb = async () => {
   if (isInitialized) return;
 
+  // Sur Vercel on n'utilise jamais SQLite (module natif incompatible)
   if (isVercel && !usePostgres) {
-    throw new Error('Aucune URL Postgres (POSTGRES_URL / DATABASE_URL). Vérifie les Environment Variables.');
+    throw new Error('Aucune URL Postgres (POSTGRES_URL ou DATABASE_URL). Ajoute-la dans les Environment Variables Vercel puis redéploie.');
   }
 
   if (!usePostgres) {
+    // Local uniquement
     const { default: Database } = await import('better-sqlite3');
     db = new Database('salon.db');
 
-    // Création de la table (si elle n’existe pas)
     db.exec(`
       CREATE TABLE IF NOT EXISTS reservations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,7 +92,6 @@ const initDb = async () => {
       )
     `);
 
-    // Migration : ajoute les colonnes manquantes sur une ancienne base SQLite
     const addColumnIfMissing = (column: string, definition: string) => {
       const columns = db.prepare('PRAGMA table_info(reservations)').all() as { name: string }[];
       if (!columns.some((c: { name: string }) => c.name === column)) {
@@ -172,9 +168,9 @@ app.post('/api/reservations', async (req, res) => {
     res.status(500).json({
       error: 'Failed to create reservation',
       details: err.message,
-      hint: usePostgres
-        ? 'Connexion Postgres échouée. Vérifie POSTGRES_URL / DATABASE_URL et redéploie.'
-        : 'Erreur SQLite locale. Vérifie que salon.db est accessible et que le schéma est à jour.'
+      hint: isVercel
+        ? 'Vérifie que POSTGRES_URL (ou DATABASE_URL) est bien défini dans les Environment Variables Vercel, puis redéploie.'
+        : 'Erreur locale SQLite.'
     });
   }
 });
