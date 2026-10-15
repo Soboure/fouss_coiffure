@@ -76,16 +76,37 @@ const initDb = async () => {
   if (!usePostgres) {
     const { default: Database } = await import('better-sqlite3');
     db = new Database('salon.db');
+
+    // Création de la table (si elle n’existe pas)
     db.exec(`
       CREATE TABLE IF NOT EXISTS reservations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        service TEXT, date TEXT, time TEXT, space TEXT,
-        clientName TEXT, clientPhone TEXT,
+        service TEXT,
+        date TEXT,
+        time TEXT,
+        space TEXT,
+        clientName TEXT,
+        clientPhone TEXT,
         status TEXT DEFAULT 'En attente',
-        code TEXT, price TEXT, source TEXT DEFAULT 'site',
+        code TEXT,
+        price TEXT,
+        source TEXT DEFAULT 'site',
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Migration : ajoute les colonnes manquantes sur une ancienne base SQLite
+    const addColumnIfMissing = (column: string, definition: string) => {
+      const columns = db.prepare('PRAGMA table_info(reservations)').all() as { name: string }[];
+      if (!columns.some((c: { name: string }) => c.name === column)) {
+        db.exec(`ALTER TABLE reservations ADD COLUMN ${column} ${definition}`);
+      }
+    };
+
+    addColumnIfMissing('code', 'TEXT');
+    addColumnIfMissing('price', 'TEXT');
+    addColumnIfMissing('source', "TEXT DEFAULT 'site'");
+
     isInitialized = true;
     return;
   }
@@ -151,9 +172,9 @@ app.post('/api/reservations', async (req, res) => {
     res.status(500).json({
       error: 'Failed to create reservation',
       details: err.message,
-      hint: !usePostgres
-        ? 'Aucune URL Postgres. Vérifie POSTGRES_URL dans les Environment Variables puis redéploie.'
-        : 'Connexion Postgres échouée. Vérifie la variable et la base Neon.'
+      hint: usePostgres
+        ? 'Connexion Postgres échouée. Vérifie POSTGRES_URL / DATABASE_URL et redéploie.'
+        : 'Erreur SQLite locale. Vérifie que salon.db est accessible et que le schéma est à jour.'
     });
   }
 });
@@ -183,7 +204,7 @@ app.delete('/api/reservations/:id', adminAuth, async (req, res) => {
     } else {
       db.prepare('DELETE FROM reservations WHERE id = ?').run(req.params.id);
     }
-    res.json({ success: true });
+    res.status(500).json({ error: 'Failed to delete', details: err.message });
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to delete', details: err.message });
   }
