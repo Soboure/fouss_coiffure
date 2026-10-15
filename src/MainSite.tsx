@@ -63,6 +63,7 @@ export default function MainSite() {
 
   const [messageTicket, setMessageTicket] = useState('');
   const [imageTicket, setImageTicket] = useState('');
+  const [ticketBlob, setTicketBlob] = useState<Blob | null>(null);
 
   const chargerLogo = () => new Promise<HTMLImageElement | null>((resoudre) => {
     const logo = new Image();
@@ -71,80 +72,124 @@ export default function MainSite() {
     logo.src = '/logo-fouss.png';
   });
 
-  const downloadTicket = async () => {
-    setMessageTicket('');
+  const genererTicket = async (): Promise<Blob | null> => {
     try {
       const toile = document.createElement('canvas');
       toile.width = 800;
       toile.height = 1120;
       const crayon = toile.getContext('2d');
-      if (!crayon) throw new Error('toile');
+      if (!crayon) return null;
+
       crayon.fillStyle = '#FFFFFF';
       crayon.fillRect(0, 0, 800, 1120);
       crayon.strokeStyle = '#2B211C';
       crayon.lineWidth = 6;
       crayon.strokeRect(28, 28, 744, 1064);
+
       const logo = await chargerLogo();
       let haut = 80;
       if (logo) {
-        const largeurLogo = 420;
+        const largeurLogo = 380;
         const hauteurLogo = logo.height * (largeurLogo / logo.width);
-        crayon.drawImage(logo, (800 - largeurLogo) / 2, 70, largeurLogo, hauteurLogo);
-        haut = 70 + hauteurLogo + 36;
+        crayon.drawImage(logo, (800 - largeurLogo) / 2, 60, largeurLogo, hauteurLogo);
+        haut = 60 + hauteurLogo + 40;
       }
+
       crayon.fillStyle = '#7A655E';
       crayon.font = '22px sans-serif';
       crayon.textAlign = 'center';
-      crayon.fillText('TICKET DE RESERVATION', 400, haut);
+      crayon.fillText('TICKET DE RÉSERVATION', 400, haut);
+
       crayon.fillStyle = '#2B211C';
       crayon.font = 'bold 32px monospace';
-      crayon.fillText(ticketCode || 'FOUSS', 400, haut + 42);
+      crayon.fillText(ticketCode || 'FOUSS', 400, haut + 46);
+
       const lignes = [
-        ['Client', formData.firstName + ' ' + formData.lastName],
-        ['Telephone', formData.clientPhone],
+        ['Client', `${formData.firstName} ${formData.lastName}`.trim()],
+        ['Téléphone', formData.clientPhone],
         ['Prestation', formData.service],
         ['Prix', prixDemande()],
-        ['Quand', formData.date + ' a ' + formData.time],
+        ['Quand', `${formData.date} à ${formData.time}`],
         ['Espace', formData.space === 'VIP' ? 'Suite VIP' : 'Standard'],
       ];
-      let y = haut + 100;
+
+      let y = haut + 110;
       lignes.forEach(([titre, valeur]) => {
         crayon.textAlign = 'left';
         crayon.fillStyle = '#7A655E';
-        crayon.font = '20px sans-serif';
+        crayon.font = '18px sans-serif';
         crayon.fillText(titre.toUpperCase(), 70, y);
         crayon.fillStyle = '#2B211C';
-        crayon.font = 'bold 28px sans-serif';
-        crayon.fillText(valeur || '-', 70, y + 34);
-        y += 78;
+        crayon.font = 'bold 26px sans-serif';
+        crayon.fillText(valeur || '—', 70, y + 32);
+        y += 72;
       });
+
       crayon.fillStyle = '#7A655E';
-      crayon.font = '20px sans-serif';
+      crayon.font = '18px sans-serif';
       crayon.textAlign = 'center';
       crayon.fillText('Haie Vive, Cotonou', 400, 1040);
-      crayon.fillText("A presenter a l'accueil", 400, 1072);
+      crayon.fillText("À présenter à l'accueil", 400, 1072);
 
-      const fichier = await new Promise<Blob>((resoudre, rejeter) => {
-        toile.toBlob(blob => blob ? resoudre(blob) : rejeter(new Error('image')), 'image/png');
+      return await new Promise<Blob>((resolve, reject) => {
+        toile.toBlob(blob => blob ? resolve(blob) : reject(new Error('canvas')), 'image/png');
       });
-      const nom = 'Ticket-FOUSS.png';
-      const image = new File([fichier], nom, { type: 'image/png' });
-      setImageTicket(URL.createObjectURL(fichier));
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [image] })) {
-        await navigator.share({ files: [image], title: 'Ticket FOUSS' });
-        setMessageTicket("Dans le menu, choisissez Enregistrer l'image.");
-        return;
+    } catch (e) {
+      console.error('Erreur génération ticket:', e);
+      return null;
+    }
+  };
+
+  const telechargerTicket = async () => {
+    setMessageTicket('');
+    const blob = ticketBlob || await genererTicket();
+    if (!blob) {
+      setMessageTicket("Impossible de générer le ticket. Réessayez.");
+      return;
+    }
+    setTicketBlob(blob);
+    const url = URL.createObjectURL(blob);
+    setImageTicket(url);
+
+    const lien = document.createElement('a');
+    lien.href = url;
+    lien.download = `Ticket-FOUSS-${ticketCode || 'reservation'}.png`;
+    document.body.appendChild(lien);
+    lien.click();
+    lien.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setMessageTicket('Ticket téléchargé.');
+  };
+
+  const partagerTicket = async () => {
+    setMessageTicket('');
+    const blob = ticketBlob || await genererTicket();
+    if (!blob) {
+      setMessageTicket("Impossible de générer le ticket.");
+      return;
+    }
+    setTicketBlob(blob);
+    const url = URL.createObjectURL(blob);
+    setImageTicket(url);
+
+    const fichier = new File([blob], `Ticket-FOUSS-${ticketCode || 'reservation'}.png`, { type: 'image/png' });
+
+    if (navigator.share && navigator.canShare?.({ files: [fichier] })) {
+      try {
+        await navigator.share({
+          files: [fichier],
+          title: 'Ticket FOUSS Coiffure',
+          text: `Réservation ${ticketCode}`,
+        });
+        setMessageTicket('Ticket partagé.');
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          setMessageTicket("Partage annulé ou non disponible. Utilisez Télécharger.");
+        }
       }
-      const lien = document.createElement('a');
-      lien.href = URL.createObjectURL(fichier);
-      lien.download = nom;
-      document.body.appendChild(lien);
-      lien.click();
-      lien.remove();
-      setMessageTicket('Le fichier est dans les telechargements.');
-    } catch (erreur) {
-      if (erreur instanceof Error && erreur.name === 'AbortError') return;
-      setMessageTicket("Sur iPhone, appuyez sur Partager le ticket, puis Enregistrer l'image.");
+    } else {
+      // Fallback : téléchargement direct
+      await telechargerTicket();
     }
   };
 
@@ -361,11 +406,24 @@ export default function MainSite() {
                   <p className="text-center text-[10px] text-taupe uppercase tracking-wider">Haie Vive, Cotonou · À présenter à l'accueil</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                  <button type="button" onClick={downloadTicket} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">Partager le ticket</button>
-                  {messageTicket && <p className="sm:col-span-2 text-xs text-warm-brown">{messageTicket}</p>}
-                  {imageTicket && <img src={imageTicket} alt="Ticket FOUSS" className="sm:col-span-2 rounded-2xl border border-sable" />}
-                  <button type="button" onClick={() => { setBookingStatus('idle'); setCurrentStep(1); setTicketCode(''); setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' }); }} className="flex-1 border border-sable py-3 rounded-full text-xs font-semibold">Nouvelle demande</button>
+                  <button type="button" onClick={telechargerTicket} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">
+                    Télécharger le ticket
+                  </button>
+                  <button type="button" onClick={partagerTicket} className="flex-1 border border-bordeaux text-bordeaux py-3 rounded-full text-xs font-bold uppercase">
+                    Partager le ticket
+                  </button>
                 </div>
+                {messageTicket && <p className="text-xs text-warm-brown mt-3 text-center">{messageTicket}</p>}
+                {imageTicket && (
+                  <div className="mt-4">
+                    <p className="text-[10px] text-taupe uppercase tracking-wider text-center mb-2">Aperçu du ticket</p>
+                    <img src={imageTicket} alt="Ticket FOUSS" className="mx-auto rounded-2xl border border-sable max-w-xs" />
+                    <p className="text-[10px] text-taupe text-center mt-2">Sur mobile, appuyez longtemps sur l'image pour l'enregistrer</p>
+                  </div>
+                )}
+                <button type="button" onClick={() => { setBookingStatus('idle'); setCurrentStep(1); setTicketCode(''); setTicketBlob(null); setImageTicket(''); setFormData({ service: '', date: '', time: '10:00', space: 'Standard', firstName: '', lastName: '', clientPhone: '' }); }} className="w-full mt-4 border border-sable py-3 rounded-full text-xs font-semibold">
+                  Nouvelle demande
+                </button>
               </div>
             ) : (
               <form onSubmit={handleBook} className="space-y-6">
@@ -405,51 +463,78 @@ export default function MainSite() {
                         <span className="block text-xs text-taupe mt-1">Cabine classique, prix affiché</span>
                       </button>
                       <button type="button" onClick={() => setFormData({ ...formData, space: 'VIP' })} className={`border rounded-2xl p-3 text-left ${formData.space === 'VIP' ? 'border-bordeaux bg-creme' : 'border-sable'}`}>
-                        <span className="block text-sm font-bold text-bordeaux">Suite VIP</span>
-                        <span className="block text-xs text-taupe mt-1">Cabine privée, +5 000 FCFA</span>
+                        <span className="block text-sm font-bold">Suite VIP</span>
+                        <span className="block text-xs text-taupe mt-1">+ 5 000 FCFA</span>
                       </button>
                     </div>
                   </div>
                 )}
 
                 {currentStep === 2 && (
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-warm-brown mb-2">Jour</label>
-                      <input required type="date" min={new Date().toISOString().split('T')[0]} value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} className="w-full border border-sable rounded-2xl px-4 py-3 text-sm bg-white text-charcoal" />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <p className="text-xs font-bold uppercase text-warm-brown mb-2">Heure</p>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                        {['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'].map(h => (
-                          <button key={h} type="button" onClick={() => setFormData({ ...formData, time: h })} className={`rounded-full py-2 text-sm font-semibold ${formData.time === h ? 'bg-bordeaux text-white' : 'bg-white border border-sable'}`}>{h}</button>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="sm:col-span-2 text-xs text-taupe">Le salon est ouvert de 09h à 23h, du lundi au samedi. 13h n'est pas proposé.</p>
+                  <div className="space-y-4">
+                    <p className="text-sm font-semibold">Date et heure</p>
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={e => setFormData({ ...formData, date: e.target.value })}
+                      className="w-full border border-sable rounded-2xl px-4 py-3 text-sm"
+                      required
+                    />
+                    <input
+                      type="time"
+                      value={formData.time}
+                      onChange={e => setFormData({ ...formData, time: e.target.value })}
+                      className="w-full border border-sable rounded-2xl px-4 py-3 text-sm"
+                      required
+                    />
                   </div>
                 )}
 
                 {currentStep === 3 && (
                   <div className="space-y-4">
-                    <p className="text-sm font-semibold">Pour vous rappeler</p>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <input required type="text" placeholder="Prénom" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} className="border border-sable rounded-xl px-4 py-3 text-sm" />
-                      <input required type="text" placeholder="Nom" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} className="border border-sable rounded-xl px-4 py-3 text-sm" />
+                    <p className="text-sm font-semibold">Vos coordonnées</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        placeholder="Prénom"
+                        value={formData.firstName}
+                        onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                        className="border border-sable rounded-2xl px-4 py-3 text-sm"
+                        required
+                      />
+                      <input
+                        type="text"
+                        placeholder="Nom"
+                        value={formData.lastName}
+                        onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                        className="border border-sable rounded-2xl px-4 py-3 text-sm"
+                        required
+                      />
                     </div>
-                    <input required type="tel" placeholder="Téléphone, exemple 57 98 50 73" value={formData.clientPhone} onChange={e => setFormData({ ...formData, clientPhone: e.target.value })} className="w-full border border-sable rounded-xl px-4 py-3 text-sm" />
+                    <input
+                      type="tel"
+                      placeholder="Téléphone"
+                      value={formData.clientPhone}
+                      onChange={e => setFormData({ ...formData, clientPhone: e.target.value })}
+                      className="w-full border border-sable rounded-2xl px-4 py-3 text-sm"
+                      required
+                    />
                   </div>
                 )}
 
-                <div className="flex justify-between items-center pt-2">
-                  {currentStep > 1 ? (
-                    <button type="button" onClick={prevStep} className="text-xs font-semibold uppercase text-warm-brown">Retour</button>
-                  ) : <span />}
+                <div className="flex gap-3 pt-2">
+                  {currentStep > 1 && (
+                    <button type="button" onClick={prevStep} className="flex-1 border border-sable py-3 rounded-full text-xs font-semibold">
+                      Précédent
+                    </button>
+                  )}
                   {currentStep < 3 ? (
-                    <button type="button" onClick={nextStep} className="bg-bordeaux text-white text-xs font-bold uppercase px-6 py-3 rounded-full">Suivant</button>
+                    <button type="button" onClick={nextStep} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase">
+                      Suivant
+                    </button>
                   ) : (
-                    <button type="submit" disabled={bookingStatus === 'loading'} className="bg-bordeaux text-white text-xs font-bold uppercase px-6 py-3 rounded-full">
-                      {bookingStatus === 'loading' ? 'Envoi...' : 'Envoyer ma demande'}
+                    <button type="submit" disabled={bookingStatus === 'loading'} className="flex-1 bg-bordeaux text-white py-3 rounded-full text-xs font-bold uppercase disabled:opacity-50">
+                      {bookingStatus === 'loading' ? 'Envoi...' : 'Envoyer la demande'}
                     </button>
                   )}
                 </div>
