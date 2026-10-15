@@ -1,16 +1,16 @@
 import 'dotenv/config';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
-import apiApp from './api/index';
+import apiApp from './server/index';
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Mount API Routes
+  // API centralisée
   app.use(apiApp);
 
-  // Vite middleware for development
+  // Vite en développement
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
