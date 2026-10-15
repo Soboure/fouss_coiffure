@@ -7,11 +7,17 @@ import { sql } from '@vercel/postgres';
 
 const router = express.Router();
 const usePostgres = !!process.env.POSTGRES_URL;
+const isVercel = !!process.env.VERCEL;
 let db: any;
 let ready = false;
 
 async function initAvis() {
   if (ready) return;
+
+  if (isVercel && !usePostgres) {
+    throw new Error('Aucune URL Postgres pour les avis.');
+  }
+
   if (!usePostgres) {
     const { default: Database } = await import('better-sqlite3');
     db = new Database('salon.db');
